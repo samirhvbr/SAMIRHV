@@ -6,8 +6,9 @@ Blog pessoal de Samir Hanna Verza, construído com Laravel e tema Canvas.
 
 - **Backend:** Laravel (PHP 8.4+)
 - **Frontend:** Blade + Canvas 7 (tema HTML5 — assets compilados em `public/vendor/canvas/`)
-- **Banco de Dados:** MySQL / MariaDB
+- **Banco de Dados:** MySQL / MariaDB (nenhum outro, e nunca usar sqlite)
 - **Servidor:** Debian (Linux)
+- **GitHub:** Sempre faça commits em blocos e com uma boa descrição, padrão é a versão de version.md - (hífen) comentário
 
 ## Objetivo
 
