@@ -1,0 +1,166 @@
+# =============================================================================
+# Blue3 Intranet — .gitignore
+# -----------------------------------------------------------------------------
+# Mantido por: Samir HV
+# Última revisão: 2026-05-18
+#
+# Estrutura: cada bloco abaixo explica O QUE ignora e POR QUÊ. Quando precisar
+# ignorar algo novo, prefira adicionar no bloco temático correto em vez de
+# empilhar regras soltas no final.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Segredos de ambiente (.env e variantes)
+# -----------------------------------------------------------------------------
+# Apenas `.env.example` (template sem segredos) é versionado. Qualquer .env
+# real ou variante (.dev, .production, .backup, .testing) fica fora.
+.env
+.env.*
+!.env.example
+.claude/settings.local.json
+
+# -----------------------------------------------------------------------------
+# Backups locais
+# -----------------------------------------------------------------------------
+# Convenção do projeto: sufixo .bck para backups manuais do Samir
+# (ex: `.env.bck`, `config.bck-20260518`). Também ignoramos .bak — sufixo
+# comum de editores (vim -bu, cp file file.bak) e ferramentas Linux.
+*.bck
+*.bak
+
+# -----------------------------------------------------------------------------
+# Espaço pessoal de bagunça (/tmp na raiz do projeto)
+# -----------------------------------------------------------------------------
+# Snippets, rascunhos, exports temporários. Nada aqui é load-bearing —
+# pode apagar a qualquer momento sem quebrar o sistema. Cuidado para
+# NÃO confundir com /tmp do sistema operacional (esse não está aqui).
+/.tmp/
+/tmp/
+
+# -----------------------------------------------------------------------------
+# Dependências (Composer / NPM)
+# -----------------------------------------------------------------------------
+# Reinstaladas via `composer install` e `npm ci`. composer.lock e
+# package-lock.json SÃO versionados (lock de versões reproduzíveis).
+/vendor/
+/node_modules/
+auth.json
+composer.phar
+
+# -----------------------------------------------------------------------------
+# Build do frontend (Vite)
+# -----------------------------------------------------------------------------
+# Gerado por `npm run build`. Em produção o deploy faz o build após o pull.
+# /public/hot existe enquanto `npm run dev` está rodando (HMR do Vite).
+/public/build/
+/public/hot
+/.vite/
+
+# -----------------------------------------------------------------------------
+# Storage do Laravel
+# -----------------------------------------------------------------------------
+# public/storage é o SYMLINK criado por `php artisan storage:link` (aponta
+# para storage/app/public). Nunca versionar — recriado a cada clone/deploy.
+/public/storage
+
+# Backups de banco gerados pelo comando `mariadb:backup` — nunca versionar.
+/storage/backups
+
+# Caches em runtime do framework. Cada subpasta tem seu próprio .gitignore
+# interno (`* + !.gitignore`) garantindo que a pasta exista no clone mas
+# fique vazia.
+/bootstrap/cache/*
+!/bootstrap/cache/.gitignore
+/storage/framework/cache/*
+!/storage/framework/cache/.gitignore
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitignore
+/storage/framework/views/*
+!/storage/framework/views/.gitignore
+/storage/framework/testing/*
+!/storage/framework/testing/.gitignore
+
+# Logs do app (laravel-*.log, audit-*.log etc) — só a pasta sobrevive.
+/storage/logs/*
+!/storage/logs/.gitignore
+
+# Chaves geradas em runtime e dump do laravel/pail.
+/storage/*.key
+/storage/pail
+
+# -----------------------------------------------------------------------------
+# Testes (PHPUnit)
+# -----------------------------------------------------------------------------
+.phpunit.result.cache
+.phpunit.cache/
+
+# -----------------------------------------------------------------------------
+# Editores e IDEs (configs locais não entram no repo)
+# -----------------------------------------------------------------------------
+# Cada desenvolvedor tem suas próprias preferências. Configs compartilhadas
+# (.editorconfig, .vscode/launch.json sem segredo) ficam fora do ignore
+# adicionando exceção explícita.
+.vscode/
+.idea/
+.fleet/
+.zed/
+.phpactor.json
+*.code-workspace
+
+# -----------------------------------------------------------------------------
+# Sistema operacional / Lixo do filesystem
+# -----------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+ehthumbs.db
+*.swp
+*.swo
+*~
+
+# -----------------------------------------------------------------------------
+# Logs avulsos (fora de storage/logs)
+# -----------------------------------------------------------------------------
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# -----------------------------------------------------------------------------
+# Source maps em produção
+# -----------------------------------------------------------------------------
+# Sourcemaps facilitam reverse engineering do código minificado. Em dev o
+# Vite os gera, mas eles ficam só na máquina local.
+*.map
+
+# -----------------------------------------------------------------------------
+# Imagens grandes / VMs (defesa contra commit acidental)
+# -----------------------------------------------------------------------------
+# Não usamos no projeto hoje, mas se alguém colocar um ISO/VM aqui o git
+# já barra antes de explodir o repositório.
+*.iso
+*.img
+*.raw
+*.qcow2
+*.vdi
+*.vmdk
+
+# -----------------------------------------------------------------------------
+# Arquivos sensíveis avulsos
+# -----------------------------------------------------------------------------
+# Chaves SSH/TLS, exports de gerenciadores de senha, certificados privados.
+# NUNCA commitar. Em caso de dúvida, mover para fora do diretório.
+*.key
+*.pem
+*.p12
+*.pfx
+secrets/
+
+# -----------------------------------------------------------------------------
+# Homestead (não usamos — defesa contra commit acidental)
+# -----------------------------------------------------------------------------
+Homestead.json
+Homestead.yaml
+
+# -----------------------------------------------------------------------------
+# AQUI INCREMENTO ADICIONAL
+# -----------------------------------------------------------------------------
