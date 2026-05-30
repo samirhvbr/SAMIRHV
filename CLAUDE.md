@@ -7,7 +7,7 @@ Este documento orienta agentes de IA (Claude Code, etc.) que trabalham no projet
 ## Comunicação
 
 - **Idioma:** Português (pt-BR) para mensagens ao operador, comentários e textos de UI.
-- **Commits:** Conventional Commits (`feat:`, `fix:`, `refactor:`, `chore:`, `docs:`). Mensagem em português.
+- **Commits:** Formato `versão - comentário` (ex: `0.1.0 - adiciona página de contato`). Versão extraída de `version.md`. Mensagem em português.
 - **Identificadores de código:** Inglês (classes, métodos, variáveis, rotas).
 - **Strings de UI:** Português.
 
@@ -18,7 +18,7 @@ Este documento orienta agentes de IA (Claude Code, etc.) que trabalham no projet
 - **Framework:** Laravel (PHP 8.4+), pasta `samirhv/`
 - **Template engine:** Blade
 - **Frontend:** Canvas 7 (tema HTML5) — assets em `public/vendor/canvas/`
-- **Banco de Dados:** MySQL / MariaDB (SQLite apenas para testes)
+- **Banco de Dados:** MySQL / MariaDB — nunca usar SQLite em nenhum contexto
 - **CSS theme:** `public/vendor/canvas/style.css` + `css/blog-theme.css`
 
 ---
