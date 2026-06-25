@@ -1,4 +1,4 @@
-# Samirhv — Blog Pessoal
+# SAMIRHV — REPOSITORIO
 
 Blog pessoal de Samir Hanna Verza, construído com Laravel e tema Canvas.
 
