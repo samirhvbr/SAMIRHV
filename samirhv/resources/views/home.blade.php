@@ -82,7 +82,7 @@
                             <!-- Badge -->
                             <div style="padding: 10px 18px; border-top: 1px solid rgba(99,102,241,0.15); background: rgba(99,102,241,0.07); display: flex; align-items: center; gap: 8px;">
                                 <span style="color: #6366f1; font-size: 0.8rem; line-height: 1;">&#10022;</span>
-                                <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #a5b4fc;">@if($featured)<strong style="color: #e0e7ff;">{{ $featured->title }}</strong> disponível@else Em breve@endif</span>
+                                <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #a5b4fc;">@if($featured) <strong style="color: #e0e7ff;">{{ $featured->title }}</strong> disponível@else Em breve@endif</span>
                                 <a href="{{ $featured ? route('project.show', $featured) : route('downloads') }}" style="margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: #6366f1; white-space: nowrap; text-decoration: none;">abrir →</a>
                             </div>
 
