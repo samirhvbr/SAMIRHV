@@ -47,6 +47,15 @@ return [
             'report' => false,
         ],
 
+        // Arquivos de projetos para download. PRIVADO de propósito: o único acesso
+        // é via /d/{file} (DownloadController), que conta e audita cada download.
+        'downloads' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private/downloads'),
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

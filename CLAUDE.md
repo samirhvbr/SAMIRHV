@@ -1,6 +1,6 @@
-# Samirhv Blog — Guia para Agentes de IA
+# Samirhv — Central de Projetos/Downloads — Guia para Agentes de IA
 
-Este documento orienta agentes de IA (Claude Code, etc.) que trabalham no projeto **Samirhv Blog**.
+Este documento orienta agentes de IA (Claude Code, etc.) que trabalham no projeto **Samirhv** — uma central pessoal para organizar e disponibilizar projetos para download (não é mais um blog; pivotado na v0.2.0).
 
 ---
 
@@ -32,28 +32,22 @@ Este documento orienta agentes de IA (Claude Code, etc.) que trabalham no projet
 ## Convenções (Laravel)
 
 - **Controllers finos:** request handling + response. Lógica vai em Services.
-- **Nomes de views:** `snake_case` em sub-pastas (ex: `blog/show.blade.php`).
-- **Rotas nomeadas:** sempre com `->name()`, ex: `route('blog.show', $slug)`.
+- **Nomes de views:** `snake_case` em sub-pastas (ex: `projects/show.blade.php`).
+- **Rotas nomeadas:** sempre com `->name()`, ex: `route('project.show', $project)`.
 - **Assets:** sempre via `asset('vendor/canvas/...')`, nunca caminho relativo.
-- **Str::limit:** usar para truncar excerpts no blade.
+- **Str::limit:** usar para truncar textos no blade.
 
-## Adicionando Posts
+## Estrutura (v0.2.0+)
 
-Posts são definidos no array `allPosts()` do `BlogController`. Cada post tem:
+**Público** (`routes/web.php`): `/` (home, vitrine), `/downloads` (lista), `/p/{slug}` (projeto), `/d/{file}` (download com contagem + auditoria), `/login`, `/logout`.
 
-```php
-[
-    'slug'         => 'meu-post',        // URL: /blog/meu-post
-    'title'        => 'Título do post',
-    'excerpt'      => 'Resumo curto...',
-    'content'      => '<p>HTML do conteúdo</p>',
-    'category'     => 'tecnologia',      // deve estar em categories()
-    'tags'         => ['tag1', 'tag2'],
-    'date'         => '30 mai. 2026',
-    'reading_time' => 5,                 // minutos
-    'featured'     => false,             // destaque na home
-]
-```
+**Admin** (`routes/admin.php`, prefixo `/admin`, middleware `auth,admin,password.changed`): dashboard, `projetos` (CRUD), `projetos/{p}/arquivos` (upload), `auditoria` (downloads + analytics), `auditoria-acesso` (ações/logins), `perfil`.
+
+**Modelo de dados:** `Project` → `hasMany ProjectFile`. Cada arquivo tem `downloads_count`; cada download gera uma linha em `download_logs`. Auditoria de visitas em `page_views` (via middleware `TrackPageView`), ações do admin em `activity_logs` (`AuditLogger`), autenticação em `auth_events` (listeners no `AppServiceProvider`).
+
+**Arquivos para download:** disco `downloads` **privado** (`storage/app/private/downloads`). O único acesso é via `/d/{file}` (`DownloadController`), que conta e audita. Upload no admin tem limite de 500 MB; arquivos maiores: `php artisan files:add <path> --project=<slug>`.
+
+**Admin único:** flag `users.is_admin` (sem Spatie). Seeder `AdminUserSeeder` cria o admin (`ADMIN_EMAIL`/`ADMIN_PASSWORD` no `.env`) com troca de senha obrigatória no 1º acesso. Sem cadastro público.
 
 ## Comandos Rápidos
 
