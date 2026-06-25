@@ -10,6 +10,9 @@ Route::get('/', [SiteController::class, 'home'])->name('home');
 Route::get('/downloads', [SiteController::class, 'downloads'])->name('downloads');
 Route::get('/p/{project}', [SiteController::class, 'show'])->name('project.show');
 
+// Páginas estáticas de projeto (descrição; sem registro no banco).
+Route::view('/projetos/github-desktop', 'projects.github-desktop')->name('project.github-desktop');
+
 // Download com contagem + auditoria (único caminho para baixar; disco privado).
 Route::get('/d/{file}', [DownloadController::class, 'track'])->name('download.track');
 
