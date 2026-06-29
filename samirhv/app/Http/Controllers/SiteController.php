@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 /**
@@ -20,7 +21,8 @@ class SiteController extends Controller
             ->get();
 
         return view('home', [
-            'featured' => $projects->first(),
+            // Destaque (card "releases.txt") só faz sentido com projeto de download.
+            'featured' => $projects->first(fn ($p) => ! $p->isLink()),
             'projects' => $projects->take(6),
             'categories' => $this->categories($projects),
         ]);
@@ -29,6 +31,7 @@ class SiteController extends Controller
     public function downloads(): View
     {
         $projects = Project::published()
+            ->whereNull('external_url')   // projetos-link não têm o que baixar
             ->with(['availableFiles' => fn ($q) => $q->orderBy('label')])
             ->orderBy('sort_order')
             ->orderByDesc('created_at')
@@ -40,9 +43,14 @@ class SiteController extends Controller
         ]);
     }
 
-    public function show(Project $project): View
+    public function show(Project $project): View|RedirectResponse
     {
         abort_unless($project->is_published, 404);
+
+        // Projeto-link: manda direto pro site externo.
+        if ($project->isLink()) {
+            return redirect()->away($project->external_url);
+        }
 
         $project->load(['availableFiles' => fn ($q) => $q->orderBy('label')]);
 

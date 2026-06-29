@@ -11,7 +11,7 @@ class Project extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'title', 'slug', 'description', 'category', 'icon',
+        'title', 'slug', 'description', 'category', 'icon', 'external_url',
         'is_published', 'sort_order',
     ];
 
@@ -23,6 +23,18 @@ class Project extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    /** Projeto-link: aponta pra um site externo, sem arquivos próprios. */
+    public function isLink(): bool
+    {
+        return filled($this->external_url);
+    }
+
+    /** URL pública do projeto: o site externo (se link) ou a página /p/{slug}. */
+    public function getPublicUrlAttribute(): string
+    {
+        return $this->external_url ?: route('project.show', $this);
     }
 
     public function files(): HasMany

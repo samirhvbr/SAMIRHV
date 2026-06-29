@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\AuthEvent;
+use App\Models\Project;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
@@ -11,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 
@@ -25,6 +27,24 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureRateLimiters();
         $this->registerAuthEventListeners();
+        $this->shareNavProjects();
+    }
+
+    /** Injeta os projetos publicados no menu "Projetos" do layout público. */
+    private function shareNavProjects(): void
+    {
+        View::composer('layouts.app', function ($view) {
+            try {
+                $projects = Project::published()
+                    ->orderBy('sort_order')
+                    ->orderByDesc('created_at')
+                    ->get(['id', 'title', 'slug', 'icon', 'category', 'external_url']);
+            } catch (\Throwable $e) {
+                $projects = collect(); // DB indisponível/migração pendente: menu não quebra a página.
+            }
+
+            $view->with('navProjects', $projects);
+        });
     }
 
     /** Limites de tentativa: login 5/min por (IP + e-mail). */

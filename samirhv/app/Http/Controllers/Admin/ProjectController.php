@@ -38,6 +38,13 @@ class ProjectController extends Controller
 
         $this->audit->record('project.create', $project->id, "Projeto criado: {$project->title}");
 
+        // Projeto-link não tem arquivos: volta pra lista. Download: vai pro upload.
+        if ($project->isLink()) {
+            return redirect()
+                ->route('admin.projects.index')
+                ->with('status', "Projeto-link \"{$project->title}\" criado.");
+        }
+
         return redirect()
             ->route('admin.projects.files.index', $project)
             ->with('status', 'Projeto criado. Agora envie os arquivos para download.');
@@ -84,6 +91,7 @@ class ProjectController extends Controller
                 'unique:projects,slug'.($project ? ','.$project->id : ''),
             ],
             'description' => ['nullable', 'string', 'max:5000'],
+            'external_url' => ['nullable', 'url:http,https', 'max:2048'],
             'category' => ['nullable', 'string', 'max:60'],
             'icon' => ['nullable', 'string', 'max:60'],
             'sort_order' => ['nullable', 'integer', 'min:0', 'max:9999'],
@@ -93,6 +101,7 @@ class ProjectController extends Controller
         $data['slug'] = $this->uniqueSlug($data['slug'] ?? Str::slug($data['title']), $project);
         $data['sort_order'] = $data['sort_order'] ?? 0;
         $data['is_published'] = $request->boolean('is_published');
+        $data['external_url'] = ($data['external_url'] ?? null) ?: null;
 
         return $data;
     }

@@ -105,23 +105,31 @@
                         <nav class="primary-menu col-lg-5 order-lg-1 on-click" aria-label="Navegação principal">
                             <ul class="menu-container">
                                 <li class="menu-item"><a class="menu-link" href="{{ route('home') }}"><div>Início</div></a></li>
+                                @php $navProjects = $navProjects ?? collect(); @endphp
+                                @if($navProjects->isNotEmpty())
                                 <li class="menu-item cp-dropdown-parent">
                                     <a class="menu-link" href="#" onclick="return false;"><div>Projetos <i class="bi-chevron-down cp-caret"></i></div></a>
                                     <ul class="cp-dropdown">
+                                        @foreach($navProjects as $navp)
                                         <li>
-                                            <a href="https://sshvterm.com" target="_blank" rel="noopener">
-                                                <i class="fa-solid fa-terminal"></i>
-                                                <span class="cp-dd-text"><strong>SShvTerm</strong><small>sshvterm.com&nbsp;↗</small></span>
-                                            </a>
+                                            @if($navp->external_url)
+                                                <a href="{{ $navp->external_url }}" target="_blank" rel="noopener">
+                                                    <i class="{{ $navp->icon ?: 'fa-solid fa-up-right-from-square' }}"></i>
+                                                    <span class="cp-dd-text"><strong>{{ $navp->title }}</strong><small>{{ preg_replace('#^www\.#', '', parse_url($navp->external_url, PHP_URL_HOST)) }}&nbsp;↗</small></span>
+                                                </a>
+                                            @else
+                                                <a href="{{ route('project.show', $navp) }}">
+                                                    <i class="{{ $navp->icon ?: 'fa-solid fa-box-open' }}"></i>
+                                                    <span class="cp-dd-text"><strong>{{ $navp->title }}</strong><small>{{ $navp->category ?: 'download' }}</small></span>
+                                                </a>
+                                            @endif
                                         </li>
-                                        <li>
-                                            <a href="{{ route('project.github-desktop') }}">
-                                                <i class="fa-brands fa-github"></i>
-                                                <span class="cp-dd-text"><strong>GitHub Desktop</strong><small>build Linux (.deb)</small></span>
-                                            </a>
-                                        </li>
+                                        @endforeach
                                     </ul>
                                 </li>
+                                @else
+                                <li class="menu-item"><a class="menu-link" href="{{ route('downloads') }}"><div>Projetos</div></a></li>
+                                @endif
                                 <li class="menu-item"><a class="menu-link" href="{{ route('downloads') }}"><div>Downloads</div></a></li>
                             </ul>
                         </nav>

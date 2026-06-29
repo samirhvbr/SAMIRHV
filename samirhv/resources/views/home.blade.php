@@ -143,13 +143,19 @@
                                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #6366f1; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2); border-radius: 4px; padding: 3px 10px;">{{ $project->category }}</span>
                                     @endif
                                 </div>
+                                @php $isLink = $project->isLink(); @endphp
                                 <h3 style="font-family: 'Inter', sans-serif; font-size: 1.125rem; font-weight: 600; color: #f1f5f9; line-height: 1.4; margin-bottom: 12px;">
-                                    <a href="{{ route('project.show', $project) }}" style="color: inherit; text-decoration: none;">{{ $project->title }}</a>
+                                    <a href="{{ $project->public_url }}" @if($isLink) target="_blank" rel="noopener" @endif style="color: inherit; text-decoration: none;">{{ $project->title }}</a>
                                 </h3>
                                 <p style="font-family: 'Inter', sans-serif; font-size: 0.9rem; color: #94a3b8; line-height: 1.7; margin-bottom: 20px;">{{ Str::limit($project->description, 120) }}</p>
                                 <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(99,102,241,0.1);">
-                                    <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #64748b;"><i class="fa-solid fa-download" style="margin-right:5px;"></i>{{ number_format($project->downloads_total ?? 0, 0, ',', '.') }}</span>
-                                    <a href="{{ route('project.show', $project) }}" style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #6366f1; text-decoration: none;">abrir →</a>
+                                    @if($isLink)
+                                        <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #64748b;"><i class="fa-solid fa-up-right-from-square" style="margin-right:5px;"></i>site</span>
+                                        <a href="{{ $project->public_url }}" target="_blank" rel="noopener" style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #6366f1; text-decoration: none;">visitar ↗</a>
+                                    @else
+                                        <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #64748b;"><i class="fa-solid fa-download" style="margin-right:5px;"></i>{{ number_format($project->downloads_total ?? 0, 0, ',', '.') }}</span>
+                                        <a href="{{ $project->public_url }}" style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #6366f1; text-decoration: none;">abrir →</a>
+                                    @endif
                                 </div>
                             </article>
                         </div>

@@ -18,6 +18,16 @@
     @error('description')<div class="err">{{ $message }}</div>@enderror
 </div>
 
+<div class="form-row">
+    <label for="external_url">Link externo (site do projeto)</label>
+    <input type="url" id="external_url" name="external_url" value="{{ old('external_url', $project->external_url) }}" maxlength="2048" placeholder="https://exemplo.com — deixe vazio para projeto com arquivos">
+    <div class="hint">
+        Preencha para um <strong>projeto-link</strong>: o site abre direto, sem arquivos (ex: SShvTerm).
+        Deixe <strong>vazio</strong> para um <strong>projeto de download</strong>: você envia os arquivos na aba <em>Arquivos</em> (ex: GitHub Desktop).
+    </div>
+    @error('external_url')<div class="err">{{ $message }}</div>@enderror
+</div>
+
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
     <div class="form-row">
         <label for="category">Categoria</label>

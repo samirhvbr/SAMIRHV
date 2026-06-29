@@ -4,6 +4,18 @@ Este documento orienta agentes de IA (Claude Code, etc.) que trabalham no projet
 
 ---
 
+## 🔄 Antes de começar: `git pull`
+
+**SEMPRE** verifique atualizações remotas antes de escrever ou alterar qualquer coisa neste repositório:
+
+```bash
+git pull          # já está pré-autorizado (allow)
+```
+
+Trabalhar sobre uma base desatualizada gera conflitos. Puxe primeiro, sempre. Para só inspecionar antes: `git fetch && git status`.
+
+---
+
 ## Comunicação
 
 - **Idioma:** Português (pt-BR) para mensagens ao operador, comentários e textos de UI.
