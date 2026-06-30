@@ -61,7 +61,7 @@
                     @if($download['has_any'])
                         <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:10px; font-family:'JetBrains Mono',monospace; font-size:.72rem; color:#94a3b8;">
                             @foreach($available as $os)
-                                <span style="display:inline-flex; align-items:center; gap:5px;"><span style="width:7px;height:7px;border-radius:50%;background:#6366f1;display:inline-block;"></span>{{ \App\Support\OsDetector::label($os) }}</span>
+                                <span style="display:inline-flex; align-items:center; gap:5px;"><span aria-hidden="true" style="width:7px;height:7px;border-radius:50%;background:#6366f1;display:inline-block;"></span>{{ \App\Support\OsDetector::label($os) }}</span>
                             @endforeach
                             @if($latestGroup && $latestGroup['version'])<span>· v{{ $latestGroup['version'] }}</span>@endif
                             @if($latestGroup && $latestGroup['date'])<span>· {{ $latestGroup['date']->translatedFormat('d M Y') }}</span>@endif
@@ -116,10 +116,10 @@
                 {{-- ─── Arquivos (abas por SO) ─── --}}
                 <h2 id="arquivos" style="font-family: 'Inter', sans-serif; font-size: 1.15rem; font-weight: 700; color: #f1f5f9; margin-bottom: 16px;">Arquivos</h2>
 
-                <div class="os-tabs" style="display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap;">
+                <div class="os-tabs" role="tablist" aria-label="Sistemas operacionais" style="display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap;">
                     @foreach(\App\Support\OsDetector::OSES as $os)
                         @php($tab = $download['tabs'][$os])
-                        <button type="button" class="os-tab{{ $os === $download['default_os'] ? ' is-active' : '' }}" data-os-tab="{{ $os }}" @if($tab['count'] === 0) disabled @endif>
+                        <button type="button" role="tab" id="tab-{{ $os }}" aria-controls="panel-{{ $os }}" aria-selected="{{ $os === $download['default_os'] ? 'true' : 'false' }}" class="os-tab{{ $os === $download['default_os'] ? ' is-active' : '' }}" data-os-tab="{{ $os }}" @if($tab['count'] === 0) disabled @endif>
                             {{ $tab['label'] }}
                             <span class="cnt">{{ $tab['count'] > 0 ? $tab['count'] : 'em breve' }}</span>
                         </button>
@@ -128,7 +128,7 @@
 
                 @foreach(\App\Support\OsDetector::OSES as $os)
                     @php($tab = $download['tabs'][$os])
-                    <div data-os-panel="{{ $os }}" @if($os !== $download['default_os']) style="display:none" @endif>
+                    <div id="panel-{{ $os }}" role="tabpanel" aria-labelledby="tab-{{ $os }}" data-os-panel="{{ $os }}" @if($os !== $download['default_os']) style="display:none" @endif>
                         @if($tab['count'] === 0)
                             <p style="font-family:'JetBrains Mono',monospace; font-size:.8rem; color:#64748b;">// build de {{ $tab['label'] }} em breve</p>
                         @else
@@ -140,8 +140,8 @@
 
                             @php($olderCount = max(0, count($tab['versions']) - 1))
                             @if($olderCount > 0)
-                                <button type="button" class="toggle-older" data-older-os="{{ $os }}">
-                                    <i class="fa-solid fa-chevron-right"></i> Versões anteriores ({{ $olderCount }})
+                                <button type="button" class="toggle-older" data-older-os="{{ $os }}" aria-expanded="false">
+                                    <i class="fa-solid fa-chevron-right" aria-hidden="true"></i> Versões anteriores ({{ $olderCount }})
                                 </button>
                                 <div data-older-wrap="{{ $os }}" style="display:none;">
                                     @foreach($tab['versions'] as $group)
@@ -175,7 +175,9 @@
             if (tab.disabled) return;
             var os = tab.getAttribute('data-os-tab');
             document.querySelectorAll('.os-tab[data-os-tab]').forEach(function (t) {
-                t.classList.toggle('is-active', t === tab);
+                var isActive = (t === tab);
+                t.classList.toggle('is-active', isActive);
+                t.setAttribute('aria-selected', isActive ? 'true' : 'false');
             });
             document.querySelectorAll('[data-os-panel]').forEach(function (p) {
                 p.style.display = (p.getAttribute('data-os-panel') === os) ? '' : 'none';
@@ -192,6 +194,7 @@
             var show = wrap.style.display === 'none';
             wrap.style.display = show ? '' : 'none';
             btn.classList.toggle('open', show);
+            btn.setAttribute('aria-expanded', show ? 'true' : 'false');
         });
     });
 
