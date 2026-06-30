@@ -32,14 +32,22 @@ class ProjectFileController extends Controller
             'file' => ['required', 'file', 'max:512000'],   // 500 MB
             'label' => ['nullable', 'string', 'max:255'],
             'version' => ['nullable', 'string', 'max:30'],
+            'os' => ['required', 'in:linux,windows,macos'],
+            'arch' => ['nullable', 'in:x64,arm64,universal'],
+            'file_type' => ['nullable', 'string', 'max:16'],
         ], [
             'file.max' => 'O arquivo excede o limite de 500 MB do upload via navegador. '
                 .'Para arquivos maiores, use o comando files:add no servidor.',
+            'os.required' => 'Selecione o sistema operacional do arquivo.',
+            'os.in' => 'Sistema operacional inválido.',
         ]);
 
         $file = $this->ingest->ingest($request->file('file'), $project, [
             'label' => $request->input('label') ?: null,
             'version' => $request->input('version') ?: null,
+            'os' => $request->input('os'),
+            'arch' => $request->input('arch') ?: null,
+            'file_type' => $request->input('file_type') ?: null,
         ]);
 
         $this->audit->record('file.upload', $file->id,

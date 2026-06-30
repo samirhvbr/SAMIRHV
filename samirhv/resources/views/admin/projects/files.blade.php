@@ -31,6 +31,35 @@
                 </div>
             </div>
 
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+                <div class="form-row">
+                    <label for="os">Sistema operacional *</label>
+                    <select id="os" name="os" required>
+                        <option value="">— selecione —</option>
+                        <option value="linux" @selected(old('os')==='linux')>Linux</option>
+                        <option value="windows" @selected(old('os')==='windows')>Windows</option>
+                        <option value="macos" @selected(old('os')==='macos')>macOS</option>
+                    </select>
+                    <div class="hint">Preenchido pelo nome do arquivo; ajuste se preciso.</div>
+                    @error('os')<div class="err">{{ $message }}</div>@enderror
+                </div>
+                <div class="form-row">
+                    <label for="arch">Arquitetura</label>
+                    <select id="arch" name="arch">
+                        <option value="">— automática —</option>
+                        <option value="x64" @selected(old('arch')==='x64')>x64</option>
+                        <option value="arm64" @selected(old('arch')==='arm64')>arm64</option>
+                        <option value="universal" @selected(old('arch')==='universal')>universal</option>
+                    </select>
+                    @error('arch')<div class="err">{{ $message }}</div>@enderror
+                </div>
+                <div class="form-row">
+                    <label for="file_type">Tipo</label>
+                    <input type="text" id="file_type" name="file_type" maxlength="16" value="{{ old('file_type') }}" placeholder="deb, exe, msi…">
+                    @error('file_type')<div class="err">{{ $message }}</div>@enderror
+                </div>
+            </div>
+
             <div id="upload-progress" style="display:none;margin-bottom:16px">
                 <div style="background:var(--panel-2);border-radius:6px;height:10px;overflow:hidden">
                     <div id="upload-bar" style="height:100%;width:0;background:linear-gradient(90deg,var(--accent),rgba(99,102,241,.5));transition:width .15s ease"></div>
@@ -49,6 +78,7 @@
             <thead>
                 <tr>
                     <th>Arquivo</th>
+                    <th>SO</th>
                     <th>Versão</th>
                     <th>Tamanho</th>
                     <th>Downloads</th>
@@ -62,6 +92,14 @@
                         <td>
                             <strong style="color:#f1f5f9">{{ $file->label }}</strong>
                             <div class="muted" style="font-family:'JetBrains Mono',monospace;font-size:.7rem">{{ $file->original_name }}@if($file->short_hash) · {{ $file->short_hash }}…@endif</div>
+                        </td>
+                        <td>
+                            @if($file->os)
+                                <span class="badge badge-muted" style="text-transform:capitalize">{{ $file->os }}</span>
+                                @if($file->arch)<span class="muted" style="font-family:'JetBrains Mono',monospace;font-size:.66rem"> {{ $file->arch }}</span>@endif
+                            @else
+                                <span class="badge badge-warn">sem SO</span>
+                            @endif
                         </td>
                         <td>{{ $file->version ? 'v'.$file->version : '—' }}</td>
                         <td>{{ $file->human_size }}</td>
@@ -87,7 +125,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="6" class="muted" style="text-align:center;padding:40px">Nenhum arquivo enviado ainda.</td></tr>
+                    <tr><td colspan="7" class="muted" style="text-align:center;padding:40px">Nenhum arquivo enviado ainda.</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -104,6 +142,43 @@
     const bar = document.getElementById('upload-bar');
     const pct = document.getElementById('upload-pct');
     const errBox = document.getElementById('upload-error');
+
+    // Pré-preenche SO/arquitetura/tipo a partir do nome do arquivo escolhido
+    // (espelha App\Support\FilenameInspector). O admin pode sobrescrever.
+    function inferFromName(name) {
+        const n = (name || '').toLowerCase();
+        const ext = n.includes('.') ? n.split('.').pop() : '';
+        let type;
+        if (ext === 'deb') type = 'deb';
+        else if (ext === 'rpm') type = 'rpm';
+        else if (n.includes('.appimage')) type = 'appimage';
+        else if (ext === 'exe') type = 'exe';
+        else if (ext === 'msi') type = 'msi';
+        else if (ext === 'dmg') type = 'dmg';
+        else if (ext === 'pkg') type = 'pkg';
+        else if (ext === 'zip') type = 'zip';
+        else type = ext || '';
+        let os = '';
+        if (['deb', 'rpm', 'appimage'].includes(type) || n.includes('linux')) os = 'linux';
+        else if (['exe', 'msi'].includes(type) || n.includes('win')) os = 'windows';
+        else if (['dmg', 'pkg'].includes(type) || n.includes('mac') || n.includes('darwin')) os = 'macos';
+        let arch = '';
+        if (n.includes('arm64') || n.includes('aarch64')) arch = 'arm64';
+        else if (n.includes('amd64') || n.includes('x86_64') || n.includes('x64')) arch = 'x64';
+        else if (n.includes('universal')) arch = 'universal';
+        return { os: os, arch: arch, file_type: type };
+    }
+
+    document.getElementById('file').addEventListener('change', function () {
+        if (!this.files.length) return;
+        const info = inferFromName(this.files[0].name);
+        const osEl = document.getElementById('os');
+        const archEl = document.getElementById('arch');
+        const typeEl = document.getElementById('file_type');
+        if (osEl && info.os) osEl.value = info.os;
+        if (archEl && info.arch) archEl.value = info.arch;
+        if (typeEl && info.file_type) typeEl.value = info.file_type;
+    });
 
     form.addEventListener('submit', function (e) {
         const fileInput = document.getElementById('file');

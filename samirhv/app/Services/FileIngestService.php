@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Project;
 use App\Models\ProjectFile;
+use App\Support\FilenameInspector;
 use Illuminate\Http\File;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -20,7 +21,7 @@ class FileIngestService
 
     /**
      * @param  UploadedFile|string  $file  Upload do form ou caminho absoluto no servidor.
-     * @param  array{label?: string, version?: ?string}  $opts
+     * @param  array{label?: string, version?: ?string, os?: ?string, arch?: ?string, file_type?: ?string}  $opts
      */
     public function ingest(UploadedFile|string $file, Project $project, array $opts = []): ProjectFile
     {
@@ -46,6 +47,9 @@ class FileIngestService
         // Grava sobrescrevendo se já existir (mesmo identity → update da linha).
         Storage::disk(self::DISK)->putFileAs((string) $project->id, $fileForStore, $safeName);
 
+        // SO/arquitetura/tipo: inferidos do nome; o que o Admin enviar sobrescreve.
+        $inferred = FilenameInspector::inspect($originalName);
+
         $payload = [
             'label' => $opts['label'] ?? pathinfo($originalName, PATHINFO_FILENAME),
             'original_name' => $originalName,
@@ -53,6 +57,9 @@ class FileIngestService
             'size' => $size,
             'sha256' => $sha256,
             'is_available' => true,
+            'os' => ($opts['os'] ?? null) ?: $inferred['os'],
+            'arch' => ($opts['arch'] ?? null) ?: $inferred['arch'],
+            'file_type' => ($opts['file_type'] ?? null) ?: $inferred['file_type'],
         ];
 
         $existing = ProjectFile::withTrashed()
