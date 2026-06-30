@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Services\DownloadPresenter;
+use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -43,7 +45,7 @@ class SiteController extends Controller
         ]);
     }
 
-    public function show(Project $project): View|RedirectResponse
+    public function show(Project $project, Request $request, DownloadPresenter $presenter): View|RedirectResponse
     {
         abort_unless($project->is_published, 404);
 
@@ -56,6 +58,7 @@ class SiteController extends Controller
 
         return view('projects.show', [
             'project' => $project,
+            'download' => $presenter->for($project, $request),
         ]);
     }
 

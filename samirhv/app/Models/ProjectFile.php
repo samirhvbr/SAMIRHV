@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Support\InstallCommand;
+use App\Support\OsDetector;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 
 class ProjectFile extends Model
@@ -64,5 +67,23 @@ class ProjectFile extends Model
     public function getShortHashAttribute(): ?string
     {
         return $this->sha256 ? substr($this->sha256, 0, 16) : null;
+    }
+
+    /** Data efetiva de lançamento (released_at, com fallback para created_at). */
+    public function getEffectiveDateAttribute(): ?Carbon
+    {
+        return $this->released_at ?? $this->created_at;
+    }
+
+    /** Rótulo do SO para exibição (Linux/Windows/macOS). */
+    public function getOsLabelAttribute(): ?string
+    {
+        return $this->os ? OsDetector::label($this->os) : null;
+    }
+
+    /** Comando de instalação + verificação por (os, file_type). */
+    public function getInstallCommandAttribute(): array
+    {
+        return InstallCommand::for($this);
     }
 }
