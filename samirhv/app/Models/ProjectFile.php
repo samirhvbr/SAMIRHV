@@ -15,12 +15,14 @@ class ProjectFile extends Model
     protected $fillable = [
         'project_id', 'label', 'filename', 'original_name', 'version',
         'size', 'sha256', 'is_available', 'downloads_count',
+        'os', 'arch', 'file_type', 'released_at',
     ];
 
     protected $casts = [
         'size' => 'integer',
         'downloads_count' => 'integer',
         'is_available' => 'boolean',
+        'released_at' => 'datetime',
     ];
 
     public function project(): BelongsTo
