@@ -20,10 +20,11 @@
 
 <div class="form-row">
     <label for="external_url">Link externo (site do projeto)</label>
-    <input type="url" id="external_url" name="external_url" value="{{ old('external_url', $project->external_url) }}" maxlength="2048" placeholder="https://exemplo.com — deixe vazio para projeto com arquivos">
+    <input type="url" id="external_url" name="external_url" value="{{ old('external_url', $project->external_url) }}" maxlength="2048" placeholder="https://exemplo.com — opcional">
     <div class="hint">
-        Preencha para um <strong>projeto-link</strong>: o site abre direto, sem arquivos (ex: SShvTerm).
-        Deixe <strong>vazio</strong> para um <strong>projeto de download</strong>: você envia os arquivos na aba <em>Arquivos</em> (ex: GitHub Desktop).
+        <strong>Link puro:</strong> preencha e não envie arquivos — o site abre direto (ex: SShvTerm).<br>
+        <strong>Download:</strong> deixe vazio e envie os arquivos na aba <em>Arquivos</em> (ex: GitHub Desktop).<br>
+        <strong>Híbrido:</strong> preencha o link <em>e</em> envie arquivos — a página mostra o botão "usar online" + os downloads (ex: ShvIA — site + app desktop).
     </div>
     @error('external_url')<div class="err">{{ $message }}</div>@enderror
 </div>

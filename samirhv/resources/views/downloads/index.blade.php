@@ -50,6 +50,9 @@
                                     @if($project->category)
                                         <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.64rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #6366f1; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2); border-radius: 4px; padding: 2px 9px;">{{ $project->category }}</span>
                                     @endif
+                                    @if($project->external_url)
+                                        <a href="{{ $project->external_url }}" target="_blank" rel="noopener" style="font-family: 'JetBrains Mono', monospace; font-size: 0.64rem; color: #818cf8; text-decoration: none; border: 1px solid rgba(99,102,241,0.25); border-radius: 4px; padding: 2px 9px;"><i class="fa-solid fa-up-right-from-square" style="margin-right:4px;"></i>usar online</a>
+                                    @endif
                                 </div>
 
                                 @if($project->description)

@@ -75,6 +75,23 @@
                 <div style="font-family: 'Inter', sans-serif; font-size: 1.02rem; color: #cbd5e1; line-height: 1.8; margin-bottom: 34px; white-space: pre-line;">{{ $project->description }}</div>
             @endif
 
+            {{-- Híbrido: site externo + downloads. O botão manda pra versão online; abaixo, o app desktop. --}}
+            @if($project->external_url)
+                <div style="background:linear-gradient(135deg, rgba(99,102,241,0.14), rgba(99,102,241,0.04)); border:1px solid rgba(99,102,241,0.3); border-radius:14px; padding:18px 20px; margin-bottom:30px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+                    <div style="flex:1; min-width:240px;">
+                        <div style="font-family:'JetBrains Mono',monospace; font-size:.66rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#6366f1; margin-bottom:5px;">Versão online</div>
+                        <div style="font-family:'Inter',sans-serif; font-size:.95rem; color:#cbd5e1; line-height:1.6;">Use direto no navegador, sem instalar — sempre na última versão.</div>
+                    </div>
+                    <a href="{{ $project->external_url }}" target="_blank" rel="noopener" class="button button-rounded m-0 dl-btn" style="align-self:center;">
+                        <i class="fa-solid fa-up-right-from-square me-2"></i>Usar online
+                    </a>
+                </div>
+
+                @if($download['has_any'])
+                    <div style="font-family:'JetBrains Mono',monospace; font-size:.78rem; color:#64748b; margin-bottom:18px;">// ou baixe o app para o seu sistema:</div>
+                @endif
+            @endif
+
             @if(session('download_unavailable'))
                 <div style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; border-radius: 10px; padding: 14px 18px; font-family: 'Inter', sans-serif; font-size: 0.9rem; margin-bottom: 24px;">
                     O arquivo <strong>{{ session('download_unavailable') }}</strong> está indisponível no momento.

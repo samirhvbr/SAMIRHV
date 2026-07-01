@@ -25,16 +25,42 @@ class Project extends Model
         return 'slug';
     }
 
-    /** Projeto-link: aponta pra um site externo, sem arquivos próprios. */
+    /** Tem um site externo associado (projeto-link ou híbrido). */
     public function isLink(): bool
     {
         return filled($this->external_url);
     }
 
-    /** URL pública do projeto: o site externo (se link) ou a página /p/{slug}. */
+    /** Tem ao menos um arquivo disponível para download. Prefere dados já carregados (evita N+1). */
+    public function hasFiles(): bool
+    {
+        if ($this->relationLoaded('availableFiles')) {
+            return $this->availableFiles->isNotEmpty();
+        }
+
+        if (array_key_exists('files_count', $this->attributes)) {
+            return (int) $this->files_count > 0;
+        }
+
+        return $this->availableFiles()->exists();
+    }
+
+    /** Projeto-link puro: só aponta pro site externo, sem arquivos próprios (→ redireciona). */
+    public function isLinkOnly(): bool
+    {
+        return $this->isLink() && ! $this->hasFiles();
+    }
+
+    /** Híbrido: tem site externo E arquivos para download (ex: ShvIA — web + app desktop). */
+    public function isHybrid(): bool
+    {
+        return $this->isLink() && $this->hasFiles();
+    }
+
+    /** URL pública do projeto: o site externo (se link puro) ou a página /p/{slug}. */
     public function getPublicUrlAttribute(): string
     {
-        return $this->external_url ?: route('project.show', $this);
+        return $this->isLinkOnly() ? $this->external_url : route('project.show', $this);
     }
 
     public function files(): HasMany

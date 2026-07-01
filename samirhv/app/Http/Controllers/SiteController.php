@@ -23,8 +23,9 @@ class SiteController extends Controller
             ->get();
 
         return view('home', [
-            // Destaque (card "releases.txt") só faz sentido com projeto de download.
-            'featured' => $projects->first(fn ($p) => ! $p->isLink()),
+            // Destaque (card "releases.txt") só faz sentido com projeto que tem arquivos
+            // (download ou híbrido); projetos-link puros não entram.
+            'featured' => $projects->first(fn ($p) => $p->files_count > 0),
             'projects' => $projects->take(6),
             'categories' => $this->categories($projects),
         ]);
@@ -33,7 +34,9 @@ class SiteController extends Controller
     public function downloads(): View
     {
         $projects = Project::published()
-            ->whereNull('external_url')   // projetos-link não têm o que baixar
+            // Projetos de download e híbridos entram; projeto-link puro (com site
+            // externo e sem arquivos) fica de fora — não há o que baixar.
+            ->where(fn ($q) => $q->whereNull('external_url')->orWhereHas('availableFiles'))
             ->with(['availableFiles' => fn ($q) => $q->orderBy('label')])
             ->orderBy('sort_order')
             ->orderByDesc('created_at')
@@ -49,12 +52,13 @@ class SiteController extends Controller
     {
         abort_unless($project->is_published, 404);
 
-        // Projeto-link: manda direto pro site externo.
-        if ($project->isLink()) {
+        $project->load(['availableFiles' => fn ($q) => $q->orderBy('label')]);
+
+        // Projeto-link puro (sem arquivos): manda direto pro site externo. Híbrido
+        // (site + arquivos) renderiza a página, com o botão "usar online" + downloads.
+        if ($project->isLinkOnly()) {
             return redirect()->away($project->external_url);
         }
-
-        $project->load(['availableFiles' => fn ($q) => $q->orderBy('label')]);
 
         return view('projects.show', [
             'project' => $project,

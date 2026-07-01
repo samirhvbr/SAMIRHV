@@ -38,16 +38,16 @@ class ProjectController extends Controller
 
         $this->audit->record('project.create', $project->id, "Projeto criado: {$project->title}");
 
-        // Projeto-link não tem arquivos: volta pra lista. Download: vai pro upload.
-        if ($project->isLink()) {
-            return redirect()
-                ->route('admin.projects.index')
-                ->with('status', "Projeto-link \"{$project->title}\" criado.");
-        }
+        // Sempre vai pro upload: projeto de download precisa de arquivos, e um
+        // projeto-link pode virar híbrido enviando arquivos (ex: app desktop).
+        // Para projeto-link puro, é só não enviar nada e sair.
+        $message = $project->isLink()
+            ? "Projeto-link \"{$project->title}\" criado. Para oferecer também downloads (ex: app desktop), envie os arquivos abaixo — senão é só sair."
+            : 'Projeto criado. Agora envie os arquivos para download.';
 
         return redirect()
             ->route('admin.projects.files.index', $project)
-            ->with('status', 'Projeto criado. Agora envie os arquivos para download.');
+            ->with('status', $message);
     }
 
     public function edit(Project $project): View

@@ -7,18 +7,20 @@ use Illuminate\Database\Seeder;
 
 /**
  * Cria os projetos iniciais que antes viviam "chumbados" no menu/HTML:
- * ShvIA e SShvTerm (projetos-link → sites próprios) e GitHub Desktop (download).
+ * ShvIA (híbrido: site + app desktop), SShvTerm (projeto-link) e GitHub Desktop (download).
  * Idempotente: usa firstOrCreate por slug, então pode rodar de novo sem duplicar.
  */
 class ProjectsSeeder extends Seeder
 {
     public function run(): void
     {
+        // Híbrido: link pra plataforma web + downloads do app desktop (Tauri).
+        // Os binários (.dmg/.msi/.AppImage/.deb) são enviados pelo admin, aba Arquivos.
         Project::firstOrCreate(
             ['slug' => 'shvia'],
             [
                 'title' => 'ShvIA',
-                'description' => 'Assistente de IA interno da Blue3 para apoio operacional e consulta de conhecimento corporativo. Acesse pela plataforma oficial.',
+                'description' => "Assistente de IA interno da Blue3 para apoio operacional e consulta de conhecimento corporativo.\n\nUse online direto no navegador (sempre na última versão) ou baixe o app desktop para Windows, macOS e Linux.",
                 'category' => 'Assistente IA',
                 'icon' => 'fa-solid fa-robot',
                 'external_url' => 'https://ia.blue3.com.br',
@@ -53,6 +55,6 @@ class ProjectsSeeder extends Seeder
             ]
         );
 
-        $this->command?->info('Projetos garantidos: ShvIA (link) + SShvTerm (link) + GitHub Desktop (download).');
+        $this->command?->info('Projetos garantidos: ShvIA (híbrido: site + app desktop) + SShvTerm (link) + GitHub Desktop (download).');
     }
 }
