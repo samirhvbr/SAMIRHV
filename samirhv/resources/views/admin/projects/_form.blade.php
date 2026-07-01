@@ -22,11 +22,22 @@
     <label for="external_url">Link externo (site do projeto)</label>
     <input type="url" id="external_url" name="external_url" value="{{ old('external_url', $project->external_url) }}" maxlength="2048" placeholder="https://exemplo.com — opcional">
     <div class="hint">
-        <strong>Link puro:</strong> preencha e não envie arquivos — o site abre direto (ex: SShvTerm).<br>
-        <strong>Download:</strong> deixe vazio e envie os arquivos na aba <em>Arquivos</em> (ex: GitHub Desktop).<br>
-        <strong>Híbrido:</strong> preencha o link <em>e</em> envie arquivos — a página mostra o botão "usar online" + os downloads (ex: ShvIA — site + app desktop).
+        Deixe <strong>vazio</strong> para um projeto só de download (ex: GitHub Desktop).
+        Preenchido, use a opção abaixo para decidir o que acontece ao clicar no projeto.
     </div>
     @error('external_url')<div class="err">{{ $message }}</div>@enderror
+</div>
+
+<div class="form-row">
+    <label class="form-check">
+        <input type="hidden" name="redirect_to_site" value="0">
+        <input type="checkbox" name="redirect_to_site" value="1" @checked(old('redirect_to_site', $project->redirect_to_site ?? true))>
+        Abrir o site direto ao clicar (link puro, sem página /p)
+    </label>
+    <div class="hint">
+        <strong>Marcado:</strong> clicar no projeto vai direto pro site externo (ex: SShvTerm).<br>
+        <strong>Desmarcado:</strong> abre a página <strong>/p/{{ old('slug', $project->slug) ?: 'slug' }}</strong> com botão "usar online" + downloads do app (ex: ShvIA). Só vale com link externo preenchido.
+    </div>
 </div>
 
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">

@@ -12,10 +12,11 @@ class Project extends Model
 
     protected $fillable = [
         'title', 'slug', 'description', 'category', 'icon', 'external_url',
-        'is_published', 'sort_order',
+        'redirect_to_site', 'is_published', 'sort_order',
     ];
 
     protected $casts = [
+        'redirect_to_site' => 'boolean',
         'is_published' => 'boolean',
         'sort_order' => 'integer',
     ];
@@ -45,22 +46,26 @@ class Project extends Model
         return $this->availableFiles()->exists();
     }
 
-    /** Projeto-link puro: só aponta pro site externo, sem arquivos próprios (→ redireciona). */
-    public function isLinkOnly(): bool
+    /**
+     * Clicar no projeto deve ir direto pro site externo? Só quando tem external_url
+     * E a flag redirect_to_site está ligada (link puro, ex: SShvTerm). Um híbrido
+     * (ShvIA) tem external_url mas a flag desligada → abre a página /p/{slug}.
+     */
+    public function redirectsToSite(): bool
     {
-        return $this->isLink() && ! $this->hasFiles();
+        return $this->isLink() && (bool) $this->redirect_to_site;
     }
 
-    /** Híbrido: tem site externo E arquivos para download (ex: ShvIA — web + app desktop). */
+    /** Híbrido: tem site externo mas mostra a página /p/{slug} (botão "usar online" + downloads). */
     public function isHybrid(): bool
     {
-        return $this->isLink() && $this->hasFiles();
+        return $this->isLink() && ! $this->redirect_to_site;
     }
 
-    /** URL pública do projeto: o site externo (se link puro) ou a página /p/{slug}. */
+    /** URL pública do projeto: o site externo (se redireciona) ou a página /p/{slug}. */
     public function getPublicUrlAttribute(): string
     {
-        return $this->isLinkOnly() ? $this->external_url : route('project.show', $this);
+        return $this->redirectsToSite() ? $this->external_url : route('project.show', $this);
     }
 
     public function files(): HasMany

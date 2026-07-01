@@ -24,6 +24,7 @@ class ProjectsSeeder extends Seeder
                 'category' => 'Assistente IA',
                 'icon' => 'fa-solid fa-robot',
                 'external_url' => 'https://ia.blue3.com.br',
+                'redirect_to_site' => false, // híbrido: abre /p/shvia com botão "usar online" + downloads
                 'is_published' => true,
                 'sort_order' => 1,
             ]
@@ -37,6 +38,7 @@ class ProjectsSeeder extends Seeder
                 'category' => 'Terminal Web',
                 'icon' => 'fa-solid fa-terminal',
                 'external_url' => 'https://sshvterm.com',
+                'redirect_to_site' => true, // link puro: abre o site direto
                 'is_published' => true,
                 'sort_order' => 1,
             ]

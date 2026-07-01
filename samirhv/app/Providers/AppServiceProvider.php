@@ -38,7 +38,7 @@ class AppServiceProvider extends ServiceProvider
                 $projects = Project::published()
                     ->orderBy('sort_order')
                     ->orderByDesc('created_at')
-                    ->get(['id', 'title', 'slug', 'icon', 'category', 'external_url']);
+                    ->get(['id', 'title', 'slug', 'icon', 'category', 'external_url', 'redirect_to_site']);
             } catch (\Throwable $e) {
                 $projects = collect(); // DB indisponível/migração pendente: menu não quebra a página.
             }

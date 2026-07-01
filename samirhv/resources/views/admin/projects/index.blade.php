@@ -26,7 +26,7 @@
                         <td>
                             <strong style="color:#f1f5f9">{{ $project->title }}</strong>
                             @if($project->external_url)
-                                <span class="badge badge-muted" style="margin-left:6px">{{ $project->files_count > 0 ? 'link + download' : 'link' }}</span>
+                                <span class="badge badge-muted" style="margin-left:6px">{{ $project->redirect_to_site ? 'link' : 'híbrido' }}</span>
                                 <div class="muted" style="font-family:'JetBrains Mono',monospace;font-size:.72rem"><a href="{{ $project->external_url }}" target="_blank" rel="noopener" style="color:inherit">{{ $project->external_url }} ↗</a></div>
                             @else
                                 <div class="muted" style="font-family:'JetBrains Mono',monospace;font-size:.72rem">/p/{{ $project->slug }}</div>

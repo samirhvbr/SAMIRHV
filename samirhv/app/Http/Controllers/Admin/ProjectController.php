@@ -92,6 +92,7 @@ class ProjectController extends Controller
             ],
             'description' => ['nullable', 'string', 'max:5000'],
             'external_url' => ['nullable', 'url:http,https', 'max:2048'],
+            'redirect_to_site' => ['nullable', 'boolean'],
             'category' => ['nullable', 'string', 'max:60'],
             'icon' => ['nullable', 'string', 'max:60'],
             'sort_order' => ['nullable', 'integer', 'min:0', 'max:9999'],
@@ -102,6 +103,8 @@ class ProjectController extends Controller
         $data['sort_order'] = $data['sort_order'] ?? 0;
         $data['is_published'] = $request->boolean('is_published');
         $data['external_url'] = ($data['external_url'] ?? null) ?: null;
+        // Só faz sentido redirecionar quando há site externo.
+        $data['redirect_to_site'] = $data['external_url'] ? $request->boolean('redirect_to_site') : false;
 
         return $data;
     }
