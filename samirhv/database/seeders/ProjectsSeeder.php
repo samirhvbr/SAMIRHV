@@ -57,6 +57,24 @@ class ProjectsSeeder extends Seeder
             ]
         );
 
-        $this->command?->info('Projetos garantidos: ShvIA (híbrido: site + app desktop) + SShvTerm (link) + GitHub Desktop (download).');
+        // Documentação: projeto open-source multiplataforma (Rust) sem binários hospedados
+        // aqui — instala via cargo/AUR/build-from-source. Renderiza a página curada
+        // 'projects.ai-usagebar' (screenshots + instalação Linux/macOS/Windows) em /p/ai-usagebar.
+        Project::firstOrCreate(
+            ['slug' => 'ai-usagebar'],
+            [
+                'title' => 'ai-usagebar',
+                'description' => "Monitor de uso dos seus planos de IA — Anthropic Claude, OpenAI Codex, Z.AI, OpenRouter e DeepSeek — direto na barra do sistema (Waybar/GNOME no Linux, menu bar no macOS, bandeja no Windows) e num TUI de terminal.\n\nEscrito em Rust. Veja abaixo como instalar e rodar em cada sistema operacional.",
+                'category' => 'Monitor de uso de IA',
+                'icon' => 'fa-solid fa-gauge-high',
+                'page_view' => 'projects.ai-usagebar',
+                'external_url' => null,
+                'redirect_to_site' => false,
+                'is_published' => true,
+                'sort_order' => 3,
+            ]
+        );
+
+        $this->command?->info('Projetos garantidos: ShvIA (híbrido) + SShvTerm (link) + GitHub Desktop (download) + ai-usagebar (documentação).');
     }
 }

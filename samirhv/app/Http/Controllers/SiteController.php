@@ -37,6 +37,9 @@ class SiteController extends Controller
             // Projetos de download e híbridos entram; projeto-link puro (que
             // redireciona pro site) fica de fora — não tem página de download.
             ->where('redirect_to_site', false)
+            // Projeto de documentação (página curada, sem arquivos) também fica de fora
+            // da vitrine de downloads — ele vive só no menu "Projetos" e na home.
+            ->whereNull('page_view')
             ->with(['availableFiles' => fn ($q) => $q->orderBy('label')])
             ->orderBy('sort_order')
             ->orderByDesc('created_at')
@@ -56,6 +59,12 @@ class SiteController extends Controller
         // renderiza a página /p/{slug}, com o botão "usar online" quando há site.
         if ($project->redirectsToSite()) {
             return redirect()->away($project->external_url);
+        }
+
+        // Página curada (projeto de documentação, sem binários hospedados aqui): renderiza
+        // o Blade dedicado — screenshots, instalação por SO, etc. — em vez do download genérico.
+        if ($project->hasCustomPage()) {
+            return view($project->page_view, ['project' => $project]);
         }
 
         $project->load(['availableFiles' => fn ($q) => $q->orderBy('label')]);

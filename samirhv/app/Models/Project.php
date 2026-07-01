@@ -11,7 +11,7 @@ class Project extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'title', 'slug', 'description', 'category', 'icon', 'external_url',
+        'title', 'slug', 'description', 'category', 'icon', 'page_view', 'external_url',
         'redirect_to_site', 'is_published', 'sort_order',
     ];
 
@@ -30,6 +30,12 @@ class Project extends Model
     public function isLink(): bool
     {
         return filled($this->external_url);
+    }
+
+    /** Página curada (Blade) em vez da página genérica de download. Ex: projeto de documentação. */
+    public function hasCustomPage(): bool
+    {
+        return filled($this->page_view);
     }
 
     /** Tem ao menos um arquivo disponível para download. Prefere dados já carregados (evita N+1). */
