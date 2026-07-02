@@ -70,6 +70,8 @@
 
     <title>@yield('title', 'Samirhv') — Projetos</title>
 
+    {{-- Matomo Analytics (self-hosted) — só renderiza com MATOMO_* configurado. --}}
+    @include('partials.matomo')
 </head>
 
 <body class="stretched dark">
@@ -112,7 +114,7 @@
                                     <ul class="cp-dropdown">
                                         @foreach($navProjects as $navp)
                                         <li>
-                                            @if($navp->external_url)
+                                            @if($navp->redirectsToSite())
                                                 <a href="{{ $navp->external_url }}" target="_blank" rel="noopener">
                                                     <i class="{{ $navp->icon ?: 'fa-solid fa-up-right-from-square' }}"></i>
                                                     <span class="cp-dd-text"><strong>{{ $navp->title }}</strong><small>{{ preg_replace('#^www\.#', '', parse_url($navp->external_url, PHP_URL_HOST)) }}&nbsp;↗</small></span>

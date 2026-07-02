@@ -26,14 +26,14 @@
                         <td>
                             <strong style="color:#f1f5f9">{{ $project->title }}</strong>
                             @if($project->external_url)
-                                <span class="badge badge-muted" style="margin-left:6px">link</span>
+                                <span class="badge badge-muted" style="margin-left:6px">{{ $project->redirect_to_site ? 'link' : 'híbrido' }}</span>
                                 <div class="muted" style="font-family:'JetBrains Mono',monospace;font-size:.72rem"><a href="{{ $project->external_url }}" target="_blank" rel="noopener" style="color:inherit">{{ $project->external_url }} ↗</a></div>
                             @else
                                 <div class="muted" style="font-family:'JetBrains Mono',monospace;font-size:.72rem">/p/{{ $project->slug }}</div>
                             @endif
                         </td>
                         <td>{{ $project->category ?? '—' }}</td>
-                        <td>{{ $project->external_url ? '—' : $project->files_count }}</td>
+                        <td>{{ $project->files_count }}</td>
                         <td><span class="total" style="font-family:'JetBrains Mono',monospace;color:#c7d2fe">{{ number_format($project->downloads_total ?? 0, 0, ',', '.') }}</span></td>
                         <td>
                             @if($project->is_published)
@@ -43,9 +43,7 @@
                             @endif
                         </td>
                         <td style="text-align:right;white-space:nowrap">
-                            @unless($project->external_url)
-                                <a href="{{ route('admin.projects.files.index', $project) }}" class="admin-btn admin-btn-sm"><i class="fa-solid fa-file-arrow-up"></i> Arquivos</a>
-                            @endunless
+                            <a href="{{ route('admin.projects.files.index', $project) }}" class="admin-btn admin-btn-sm"><i class="fa-solid fa-file-arrow-up"></i> Arquivos</a>
                             <a href="{{ route('admin.projects.edit', $project) }}" class="admin-btn admin-btn-sm"><i class="fa-solid fa-pen"></i></a>
                             <form method="POST" action="{{ route('admin.projects.destroy', $project) }}" style="display:inline" onsubmit="return confirm('Remover o projeto &quot;{{ $project->title }}&quot; e seus arquivos?')">
                                 @csrf @method('DELETE')

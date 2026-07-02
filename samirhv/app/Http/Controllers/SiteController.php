@@ -23,8 +23,9 @@ class SiteController extends Controller
             ->get();
 
         return view('home', [
-            // Destaque (card "releases.txt") só faz sentido com projeto de download.
-            'featured' => $projects->first(fn ($p) => ! $p->isLink()),
+            // Destaque (card "releases.txt") só faz sentido com projeto que tem arquivos
+            // (download ou híbrido); projetos-link puros não entram.
+            'featured' => $projects->first(fn ($p) => $p->files_count > 0),
             'projects' => $projects->take(6),
             'categories' => $this->categories($projects),
         ]);
@@ -33,7 +34,12 @@ class SiteController extends Controller
     public function downloads(): View
     {
         $projects = Project::published()
-            ->whereNull('external_url')   // projetos-link não têm o que baixar
+            // Projetos de download e híbridos entram; projeto-link puro (que
+            // redireciona pro site) fica de fora — não tem página de download.
+            ->where('redirect_to_site', false)
+            // Projeto de documentação (página curada, sem arquivos) também fica de fora
+            // da vitrine de downloads — ele vive só no menu "Projetos" e na home.
+            ->whereNull('page_view')
             ->with(['availableFiles' => fn ($q) => $q->orderBy('label')])
             ->orderBy('sort_order')
             ->orderByDesc('created_at')
@@ -49,9 +55,16 @@ class SiteController extends Controller
     {
         abort_unless($project->is_published, 404);
 
-        // Projeto-link: manda direto pro site externo.
-        if ($project->isLink()) {
+        // Link puro (redirect ligado): manda direto pro site externo. Híbrido/download
+        // renderiza a página /p/{slug}, com o botão "usar online" quando há site.
+        if ($project->redirectsToSite()) {
             return redirect()->away($project->external_url);
+        }
+
+        // Página curada (projeto de documentação, sem binários hospedados aqui): renderiza
+        // o Blade dedicado — screenshots, instalação por SO, etc. — em vez do download genérico.
+        if ($project->hasCustomPage()) {
+            return view($project->page_view, ['project' => $project]);
         }
 
         $project->load(['availableFiles' => fn ($q) => $q->orderBy('label')]);

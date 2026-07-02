@@ -38,16 +38,16 @@ class ProjectController extends Controller
 
         $this->audit->record('project.create', $project->id, "Projeto criado: {$project->title}");
 
-        // Projeto-link não tem arquivos: volta pra lista. Download: vai pro upload.
-        if ($project->isLink()) {
-            return redirect()
-                ->route('admin.projects.index')
-                ->with('status', "Projeto-link \"{$project->title}\" criado.");
-        }
+        // Sempre vai pro upload: projeto de download precisa de arquivos, e um
+        // projeto-link pode virar híbrido enviando arquivos (ex: app desktop).
+        // Para projeto-link puro, é só não enviar nada e sair.
+        $message = $project->isLink()
+            ? "Projeto-link \"{$project->title}\" criado. Para oferecer também downloads (ex: app desktop), envie os arquivos abaixo — senão é só sair."
+            : 'Projeto criado. Agora envie os arquivos para download.';
 
         return redirect()
             ->route('admin.projects.files.index', $project)
-            ->with('status', 'Projeto criado. Agora envie os arquivos para download.');
+            ->with('status', $message);
     }
 
     public function edit(Project $project): View
@@ -92,6 +92,7 @@ class ProjectController extends Controller
             ],
             'description' => ['nullable', 'string', 'max:5000'],
             'external_url' => ['nullable', 'url:http,https', 'max:2048'],
+            'redirect_to_site' => ['nullable', 'boolean'],
             'category' => ['nullable', 'string', 'max:60'],
             'icon' => ['nullable', 'string', 'max:60'],
             'sort_order' => ['nullable', 'integer', 'min:0', 'max:9999'],
@@ -102,6 +103,8 @@ class ProjectController extends Controller
         $data['sort_order'] = $data['sort_order'] ?? 0;
         $data['is_published'] = $request->boolean('is_published');
         $data['external_url'] = ($data['external_url'] ?? null) ?: null;
+        // Só faz sentido redirecionar quando há site externo.
+        $data['redirect_to_site'] = $data['external_url'] ? $request->boolean('redirect_to_site') : false;
 
         return $data;
     }

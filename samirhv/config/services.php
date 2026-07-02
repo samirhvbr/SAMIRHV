@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    // Matomo Analytics (self-hosted em a.blue3.cloud). O snippet
+    // (resources/views/partials/matomo.blade.php) só é injetado no <head> quando
+    // 'enabled' é true E 'site_id' está definido. site_id 2 = "samirhv.com.br".
+    'matomo' => [
+        'enabled' => env('MATOMO_ENABLED', false),
+        'url' => env('MATOMO_URL', 'https://a.blue3.cloud/'),
+        'site_id' => env('MATOMO_SITE_ID'),
+        'cookie_domain' => env('MATOMO_COOKIE_DOMAIN'),
+    ],
+
 ];

@@ -11,11 +11,12 @@ class Project extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'title', 'slug', 'description', 'category', 'icon', 'external_url',
-        'is_published', 'sort_order',
+        'title', 'slug', 'description', 'category', 'icon', 'page_view', 'external_url',
+        'redirect_to_site', 'is_published', 'sort_order',
     ];
 
     protected $casts = [
+        'redirect_to_site' => 'boolean',
         'is_published' => 'boolean',
         'sort_order' => 'integer',
     ];
@@ -25,16 +26,52 @@ class Project extends Model
         return 'slug';
     }
 
-    /** Projeto-link: aponta pra um site externo, sem arquivos próprios. */
+    /** Tem um site externo associado (projeto-link ou híbrido). */
     public function isLink(): bool
     {
         return filled($this->external_url);
     }
 
-    /** URL pública do projeto: o site externo (se link) ou a página /p/{slug}. */
+    /** Página curada (Blade) em vez da página genérica de download. Ex: projeto de documentação. */
+    public function hasCustomPage(): bool
+    {
+        return filled($this->page_view);
+    }
+
+    /** Tem ao menos um arquivo disponível para download. Prefere dados já carregados (evita N+1). */
+    public function hasFiles(): bool
+    {
+        if ($this->relationLoaded('availableFiles')) {
+            return $this->availableFiles->isNotEmpty();
+        }
+
+        if (array_key_exists('files_count', $this->attributes)) {
+            return (int) $this->files_count > 0;
+        }
+
+        return $this->availableFiles()->exists();
+    }
+
+    /**
+     * Clicar no projeto deve ir direto pro site externo? Só quando tem external_url
+     * E a flag redirect_to_site está ligada (link puro, ex: SShvTerm). Um híbrido
+     * (ShvIA) tem external_url mas a flag desligada → abre a página /p/{slug}.
+     */
+    public function redirectsToSite(): bool
+    {
+        return $this->isLink() && (bool) $this->redirect_to_site;
+    }
+
+    /** Híbrido: tem site externo mas mostra a página /p/{slug} (botão "usar online" + downloads). */
+    public function isHybrid(): bool
+    {
+        return $this->isLink() && ! $this->redirect_to_site;
+    }
+
+    /** URL pública do projeto: o site externo (se redireciona) ou a página /p/{slug}. */
     public function getPublicUrlAttribute(): string
     {
-        return $this->external_url ?: route('project.show', $this);
+        return $this->redirectsToSite() ? $this->external_url : route('project.show', $this);
     }
 
     public function files(): HasMany
