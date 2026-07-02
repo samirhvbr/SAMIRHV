@@ -26,6 +26,7 @@ Route::prefix('admin')->name('admin.')
         Route::get('/projetos/{project}/arquivos', [ProjectFileController::class, 'index'])->name('projects.files.index');
         Route::post('/projetos/{project}/arquivos', [ProjectFileController::class, 'store'])->name('projects.files.store');
         Route::patch('/projetos/{project}/arquivos/{file}/disponivel', [ProjectFileController::class, 'toggleAvailable'])->name('projects.files.available');
+        Route::put('/projetos/{project}/arquivos/{file}', [ProjectFileController::class, 'update'])->name('projects.files.update');
         Route::delete('/projetos/{project}/arquivos/{file}', [ProjectFileController::class, 'destroy'])->name('projects.files.destroy');
 
         // Auditorias

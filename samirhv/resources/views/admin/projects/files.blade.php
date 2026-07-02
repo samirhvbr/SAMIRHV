@@ -118,6 +118,13 @@
                                 @csrf @method('PATCH')
                                 <button type="submit" class="admin-btn admin-btn-sm">{{ $file->is_available ? 'Ocultar' : 'Disponibilizar' }}</button>
                             </form>
+                            <button type="button" class="admin-btn admin-btn-sm" data-edit-file
+                                data-action="{{ route('admin.projects.files.update', [$project, $file]) }}"
+                                data-label="{{ $file->label }}"
+                                data-version="{{ $file->version }}"
+                                data-os="{{ $file->os }}"
+                                data-arch="{{ $file->arch }}"
+                                data-type="{{ $file->file_type }}"><i class="fa-solid fa-pen"></i> Editar</button>
                             <form method="POST" action="{{ route('admin.projects.files.destroy', [$project, $file]) }}" style="display:inline" onsubmit="return confirm('Remover o arquivo &quot;{{ $file->label }}&quot;?')">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="admin-btn admin-btn-sm admin-btn-danger"><i class="fa-solid fa-trash"></i></button>
@@ -131,7 +138,58 @@
         </table>
     </div>
 
+    {{-- Modal: editar metadados do arquivo (preenchido via JS a partir do botão Editar) --}}
+    <dialog id="edit-modal" class="admin-card" aria-label="Editar arquivo">
+        <h2 style="display:flex;align-items:center;gap:8px"><i class="fa-solid fa-pen"></i> Editar arquivo</h2>
+        <form id="edit-form" method="POST">
+            @csrf
+            @method('PUT')
+            <div class="form-row">
+                <label for="edit-label">Rótulo (nome exibido)</label>
+                <input type="text" id="edit-label" name="label" maxlength="255" placeholder="usa o nome do arquivo se vazio">
+            </div>
+            <div class="form-row">
+                <label for="edit-version">Versão</label>
+                <input type="text" id="edit-version" name="version" maxlength="30" placeholder="ex: 1.0.0">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+                <div class="form-row">
+                    <label for="edit-os">Sistema operacional *</label>
+                    <select id="edit-os" name="os" required>
+                        <option value="linux">Linux</option>
+                        <option value="windows">Windows</option>
+                        <option value="macos">macOS</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label for="edit-arch">Arquitetura</label>
+                    <select id="edit-arch" name="arch">
+                        <option value="">— automática —</option>
+                        <option value="x64">x64</option>
+                        <option value="arm64">arm64</option>
+                        <option value="universal">universal</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label for="edit-type">Tipo</label>
+                    <input type="text" id="edit-type" name="file_type" maxlength="16" placeholder="deb, exe, msi…">
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+                <button type="button" class="admin-btn admin-btn-sm" id="edit-cancel">Cancelar</button>
+                <button type="submit" class="admin-btn admin-btn-primary admin-btn-sm"><i class="fa-solid fa-check"></i> Salvar</button>
+            </div>
+        </form>
+    </dialog>
+
 @endsection
+
+@push('styles')
+<style>
+    #edit-modal{width:min(560px,92vw);max-width:none;border:none;color:var(--txt);margin:auto;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+    #edit-modal::backdrop{background:rgba(6,6,12,.68)}
+</style>
+@endpush
 
 @push('scripts')
 <script>
@@ -224,6 +282,34 @@
         wrap.style.display = 'none';
         btn.disabled = false;
     }
+})();
+</script>
+@endpush
+
+@push('scripts')
+<script>
+(function () {
+    const modal = document.getElementById('edit-modal');
+    if (!modal || typeof modal.showModal !== 'function') return;
+    const form = document.getElementById('edit-form');
+    const set = function (id, v) { const el = document.getElementById(id); if (el) el.value = v || ''; };
+
+    document.querySelectorAll('[data-edit-file]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            form.action = btn.dataset.action;
+            set('edit-label', btn.dataset.label);
+            set('edit-version', btn.dataset.version);
+            set('edit-os', btn.dataset.os);
+            set('edit-arch', btn.dataset.arch);
+            set('edit-type', btn.dataset.type);
+            modal.showModal();
+        });
+    });
+
+    const cancel = document.getElementById('edit-cancel');
+    if (cancel) cancel.addEventListener('click', function () { modal.close(); });
+    // fecha ao clicar fora (no backdrop)
+    modal.addEventListener('click', function (e) { if (e.target === modal) modal.close(); });
 })();
 </script>
 @endpush

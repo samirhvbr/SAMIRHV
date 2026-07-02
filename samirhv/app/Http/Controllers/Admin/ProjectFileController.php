@@ -69,6 +69,37 @@ class ProjectFileController extends Controller
         return back()->with('status', $file->is_available ? 'Arquivo disponibilizado.' : 'Arquivo ocultado.');
     }
 
+    public function update(Request $request, Project $project, ProjectFile $file): RedirectResponse
+    {
+        abort_unless($file->project_id === $project->id, 404);
+
+        $data = $request->validate([
+            'label' => ['nullable', 'string', 'max:255'],
+            'version' => ['nullable', 'string', 'max:30'],
+            'os' => ['required', 'in:linux,windows,macos'],
+            'arch' => ['nullable', 'in:x64,arm64,universal'],
+            'file_type' => ['nullable', 'string', 'max:16'],
+        ], [
+            'os.required' => 'Selecione o sistema operacional do arquivo.',
+            'os.in' => 'Sistema operacional inválido.',
+        ]);
+
+        // Só metadados — o binário (filename/size/sha256) nunca muda aqui.
+        $file->update([
+            'label' => $data['label'] ?: $file->original_name,
+            'version' => $data['version'] ?: null,
+            'os' => $data['os'],
+            'arch' => $data['arch'] ?: null,
+            'file_type' => $data['file_type'] ?: null,
+        ]);
+
+        $this->audit->record('file.update', $file->id,
+            "Arquivo editado: {$file->label} — projeto {$project->title}");
+
+        return redirect()->route('admin.projects.files.index', $project)
+            ->with('status', "Arquivo \"{$file->label}\" atualizado.");
+    }
+
     public function destroy(Project $project, ProjectFile $file): RedirectResponse
     {
         abort_unless($file->project_id === $project->id, 404);
