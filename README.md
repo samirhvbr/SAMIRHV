@@ -1,30 +1,30 @@
-# SAMIRHV — REPOSITORIO
-teste
+# SAMIRHV — REPOSITORY
+test
 
-Blog pessoal de Samir Hanna Verza, construído com Laravel e tema Canvas.
+Personal blog by Samir Hanna Verza, built with Laravel and the Canvas theme.
 
-## Tecnologias
+## Technologies
 
 - **Backend:** Laravel (PHP 8.4+)
-- **Frontend:** Blade + Canvas 7 (tema HTML5 — assets compilados em `public/vendor/canvas/`)
-- **Banco de Dados:** MySQL / MariaDB (nenhum outro, e nunca usar sqlite)
-- **Servidor:** Debian (Linux)
-- **GitHub:** Sempre faça commits em blocos e com uma boa descrição, padrão é a versão de version.md - (hífen) comentário
+- **Frontend:** Blade + Canvas 7 (HTML5 theme — assets compiled into `public/vendor/canvas/`)
+- **Database:** MySQL / MariaDB (nothing else, and never use sqlite)
+- **Server:** Debian (Linux)
+- **GitHub:** Always commit in blocks and with a good description; the standard is the version from version.md - (hyphen) comment
 
-## Objetivo
+## Goal
 
-Espaço pessoal para publicar posts sobre tecnologia, desenvolvimento de software, Linux e outros temas de interesse.
+A personal space to publish posts about technology, software development, Linux and other topics of interest.
 
-## Estrutura de Pastas
+## Folder Structure
 
 ```
-samirhv/                     ← raiz do repositório
-├── samirhv/                 ← aplicação Laravel
+samirhv/                     ← repository root
+├── samirhv/                 ← Laravel application
 │   ├── app/
 │   │   ├── Http/Controllers/BlogController.php
 │   │   └── ...
 │   ├── public/
-│   │   ├── vendor/canvas/   ← assets do tema Canvas (CSS, JS)
+│   │   ├── vendor/canvas/   ← Canvas theme assets (CSS, JS)
 │   │   └── favicon.ico
 │   ├── resources/views/
 │   │   ├── layouts/app.blade.php
@@ -32,23 +32,23 @@ samirhv/                     ← raiz do repositório
 │   │   └── blog/            ← index.blade.php, show.blade.php
 │   ├── routes/web.php
 │   └── ...
-├── img/                     ← favicons e imagens do projeto
-├── tmp/                     ← arquivos de referência (ignorado pelo git, será excluído)
-├── CLAUDE.md                ← guia para agentes de IA
+├── img/                     ← project favicons and images
+├── tmp/                     ← reference files (git-ignored, will be deleted)
+├── CLAUDE.md                ← guide for AI agents
 ├── SECURITY_GUIDELINES.md
 └── version.md
 ```
 
 ## Posts
 
-Por ora os posts estão definidos como array estático no `BlogController`. Para adicionar um novo post, edite o método `allPosts()` em `app/Http/Controllers/BlogController.php`.
+For now, posts are defined as a static array in `BlogController`. To add a new post, edit the `allPosts()` method in `app/Http/Controllers/BlogController.php`.
 
-No futuro, migrar para banco de dados com tabela `posts`.
+In the future, migrate to a database with a `posts` table.
 
-## Versão
+## Version
 
-`version.md` na raiz registra a versão pública no formato `X.Y.Z`:
+`version.md` at the root records the public version in the `X.Y.Z` format:
 
-- **X** — versão estável (mudança manual)
-- **Y** — mudança estrutural significativa
-- **Z** — incremento a cada nova tela, tabela, ou mudança de layout
+- **X** — stable version (manual change)
+- **Y** — significant structural change
+- **Z** — increment for each new screen, table, or layout change
