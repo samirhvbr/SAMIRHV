@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AccessAuditController;
+use App\Http\Controllers\Admin\AiMemoryController;
 use App\Http\Controllers\Admin\AuditController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProfileController;
@@ -32,6 +33,25 @@ Route::prefix('admin')->name('admin.')
         // Auditorias
         Route::get('/auditoria', [AuditController::class, 'index'])->name('audit.index');
         Route::get('/auditoria-acesso', [AccessAuditController::class, 'index'])->name('access-audit.index');
+
+        // AI-MEMORY — consulta SOMENTE LEITURA ao SQLite do ai-memory (ver docs/AI-MEMORY.md).
+        // {hexId} = lower(hex(id)) de 32 chars (os ids do ai-memory são BLOB/UUIDv7).
+        Route::prefix('ai-memory')->name('ai-memory.')->controller(AiMemoryController::class)
+            ->where(['hexId' => '[0-9a-fA-F]{32}'])
+            ->group(function () {
+                Route::get('/', 'dashboard')->name('dashboard');
+                Route::get('/projetos', 'projects')->name('projects');
+                Route::get('/projetos/{hexId}', 'projectShow')->name('projects.show');
+                Route::get('/paginas', 'pages')->name('pages');
+                Route::get('/paginas/{hexId}', 'pageShow')->name('pages.show');
+                Route::get('/sessoes', 'sessions')->name('sessions');
+                Route::get('/sessoes/{hexId}', 'sessionShow')->name('sessions.show');
+                Route::get('/observacoes', 'observations')->name('observations');
+                Route::get('/observacoes/{hexId}', 'observationShow')->name('observations.show');
+                Route::get('/handoffs', 'handoffs')->name('handoffs');
+                Route::get('/handoffs/{hexId}', 'handoffShow')->name('handoffs.show');
+                Route::get('/busca', 'search')->name('search');
+            });
 
         // Perfil / troca de senha
         Route::get('/perfil', [ProfileController::class, 'edit'])->name('profile');

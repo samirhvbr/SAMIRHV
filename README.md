@@ -6,7 +6,7 @@ Personal blog by Samir Hanna Verza, built with Laravel and the Canvas theme.
 
 - **Backend:** Laravel (PHP 8.4+)
 - **Frontend:** Blade + Canvas 7 (HTML5 theme — assets compiled into `public/vendor/canvas/`)
-- **Database:** MySQL / MariaDB (nothing else, and never use sqlite)
+- **Database:** MySQL / MariaDB for app storage (nothing else, and never use sqlite). *Exception:* the admin **AI-MEMORY** module reads the external `ai-memory` SQLite **read-only** — see `samirhv/docs/AI-MEMORY.md`.
 - **Server:** Debian (Linux)
 - **GitHub:** Always commit in blocks and with a good description; the standard is the version from version.md - (hyphen) comment
 

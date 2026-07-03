@@ -118,6 +118,7 @@
         <a href="{{ route('admin.projects.index') }}" class="nav-link {{ str_starts_with((string) $r, 'admin.projects') ? 'active' : '' }}"><i class="fa-solid fa-folder-open"></i><span>Projetos</span></a>
         <a href="{{ route('admin.audit.index') }}" class="nav-link {{ $r === 'admin.audit.index' ? 'active' : '' }}"><i class="fa-solid fa-chart-line"></i><span>Auditoria</span></a>
         <a href="{{ route('admin.access-audit.index') }}" class="nav-link {{ $r === 'admin.access-audit.index' ? 'active' : '' }}"><i class="fa-solid fa-user-shield"></i><span>Aud. de Acesso</span></a>
+        <a href="{{ route('admin.ai-memory.dashboard') }}" class="nav-link {{ str_starts_with((string) $r, 'admin.ai-memory') ? 'active' : '' }}"><i class="fa-solid fa-brain"></i><span>AI-MEMORY</span></a>
         <a href="{{ route('admin.profile') }}" class="nav-link {{ $r === 'admin.profile' ? 'active' : '' }}"><i class="fa-solid fa-gear"></i><span>Perfil</span></a>
         <div class="spacer"></div>
         <div class="who">{{ auth()->user()?->email }}</div>

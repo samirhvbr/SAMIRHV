@@ -102,6 +102,34 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
+        /*
+        | ------------------------------------------------------------------
+        | ai-memory (SQLite EXTERNO, SOMENTE LEITURA)  —  exceção deliberada
+        | ------------------------------------------------------------------
+        | O CLAUDE.md manda "nunca usar SQLite em nenhum contexto". Essa regra
+        | vale para o ARMAZENAMENTO do app, que continua 100% MySQL/MariaDB
+        | (inclusive a tabela `ai_memory_stat_snapshots`). ESTA conexão NÃO é
+        | armazenamento nosso: é uma janela read-only para o banco do produto
+        | `ai-memory` (github.com/akitaonrails/ai-memory), que roda como
+        | container Docker NO MESMO SERVIDOR e guarda seu índice em SQLite
+        | (WAL) dentro do volume `ai-memory-data`, em `/data/db/memory.sqlite`.
+        |
+        | Só emitimos SELECT (App\Services\AiMemory\AiMemoryDatabase aplica
+        | `PRAGMA query_only=1`): o ai-memory é o único writer legítimo — gravar
+        | por fora corromperia o FTS5 e os invariantes dele. Ver docs/AI-MEMORY.md.
+        |
+        | Se o path não existir/for ilegível (app saiu do servidor, volume
+        | mudou, `www-data` sem permissão), a UI degrada com um aviso que
+        | explica exatamente isso — nada aqui derruba o app.
+        */
+        'aimemory' => [
+            'driver' => 'sqlite',
+            'database' => env('AI_MEMORY_SQLITE_PATH', '/var/lib/docker/volumes/ai-memory-data/_data/db/memory.sqlite'),
+            'prefix' => '',
+            'foreign_key_constraints' => false,   // não navegamos FKs; evita overhead e travas
+            'busy_timeout' => 3000,               // ai-memory é o writer; a gente só espera um pouco e lê
+        ],
+
     ],
 
     /*

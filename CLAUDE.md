@@ -30,7 +30,7 @@ Trabalhar sobre uma base desatualizada gera conflitos. Puxe primeiro, sempre. Pa
 - **Framework:** Laravel (PHP 8.4+), pasta `samirhv/`
 - **Template engine:** Blade
 - **Frontend:** Canvas 7 (tema HTML5) — assets em `public/vendor/canvas/`
-- **Banco de Dados:** MySQL / MariaDB — nunca usar SQLite em nenhum contexto
+- **Banco de Dados:** MySQL / MariaDB — nunca usar SQLite como **armazenamento do app**. **Exceção deliberada:** o módulo **AI-MEMORY** do admin lê (somente leitura, `PRAGMA query_only`) o SQLite **externo** do produto `ai-memory` — é fonte de dados de terceiro, não storage nosso. Não "conserte" a conexão `aimemory` em `config/database.php`. Ver `samirhv/docs/AI-MEMORY.md`.
 - **CSS theme:** `public/vendor/canvas/style.css` + `css/blog-theme.css`
 
 ---
