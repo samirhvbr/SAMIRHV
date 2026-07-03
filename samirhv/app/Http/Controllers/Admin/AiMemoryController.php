@@ -57,7 +57,7 @@ class AiMemoryController extends Controller
             return [
                 'project' => $project,
                 'recentPages' => $pages->paginate($hexId, 10)->items(),
-                'recentSessions' => $sessions->paginate($hexId, 10)->items(),
+                'recentSessions' => $sessions->paginate(['project' => $hexId], 10)->items(),
             ];
         });
     }
@@ -85,12 +85,18 @@ class AiMemoryController extends Controller
 
     public function sessions(Request $request, SessionRepository $sessions, ProjectRepository $projects): View
     {
-        $project = $request->string('project')->toString() ?: null;
+        $filters = $request->validate([
+            'project' => ['nullable', 'string', 'max:64'],
+            'agent' => ['nullable', 'string', 'max:40'],
+            'days' => ['nullable', 'integer', 'in:1,7,30,90'],
+            'sort' => ['nullable', 'string', 'in:recent,oldest,longest,shortest'],
+        ]);
 
         return $this->screen('admin.ai-memory.sessions', fn () => [
-            'sessions' => $sessions->paginate($project, $this->perPage())->withQueryString(),
+            'sessions' => $sessions->paginate($filters, $this->perPage())->withQueryString(),
             'projectOptions' => $projects->options(),
-            'project' => $project,
+            'agentKinds' => $sessions->agentKinds(),
+            'filters' => $filters,
         ]);
     }
 
