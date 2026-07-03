@@ -1,5 +1,4 @@
 # SAMIRHV — REPOSITORIO
-teste
 
 Blog pessoal de Samir Hanna Verza, construído com Laravel e tema Canvas.
 

@@ -1,5 +1,4 @@
 # SAMIRHV — REPOSITORY
-test
 
 Personal blog by Samir Hanna Verza, built with Laravel and the Canvas theme.
 
