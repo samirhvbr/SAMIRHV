@@ -6,9 +6,9 @@
 @push('styles')
 <style>
     /* ── Tipografia de seção ─────────────────────────────────────── */
-    .aub-h2{ font-family:'Inter',sans-serif; font-size:1.35rem; font-weight:700; color:#f1f5f9; letter-spacing:-.01em; margin:0 0 6px; }
-    .aub-lead{ font-family:'Inter',sans-serif; font-size:.95rem; color:#94a3b8; line-height:1.7; margin:0 0 22px; }
-    .aub-h3{ font-family:'Inter',sans-serif; font-size:1.02rem; font-weight:600; color:#e2e8f0; margin:26px 0 10px; display:flex; align-items:center; gap:9px; }
+    .aub-h2{ font-family:var(--s-sans); font-size:1.35rem; font-weight:700; color:#f1f5f9; letter-spacing:-.01em; margin:0 0 6px; }
+    .aub-lead{ font-family:var(--s-sans); font-size:.95rem; color:#94a3b8; line-height:1.7; margin:0 0 22px; }
+    .aub-h3{ font-family:var(--s-sans); font-size:1.02rem; font-weight:600; color:#e2e8f0; margin:26px 0 10px; display:flex; align-items:center; gap:9px; }
     .aub-h3 i{ color:#6366f1; font-size:.95rem; }
 
     /* ── Blocos de comando com copiar ────────────────────────────── */
@@ -22,7 +22,7 @@
     .aub-copy.copied{ color:#34d399; border-color:rgba(52,211,153,0.5); }
 
     /* ── Callout ─────────────────────────────────────────────────── */
-    .aub-note{ display:flex; gap:11px; background:rgba(99,102,241,0.07); border:1px solid rgba(99,102,241,0.2); border-radius:11px; padding:13px 16px; margin:0 0 16px; font-family:'Inter',sans-serif; font-size:.86rem; color:#cbd5e1; line-height:1.6; }
+    .aub-note{ display:flex; gap:11px; background:rgba(99,102,241,0.07); border:1px solid rgba(99,102,241,0.2); border-radius:11px; padding:13px 16px; margin:0 0 16px; font-family:var(--s-sans); font-size:.86rem; color:#cbd5e1; line-height:1.6; }
     .aub-note i{ color:#6366f1; margin-top:2px; flex-shrink:0; }
     .aub-note.amber{ background:rgba(234,179,8,0.07); border-color:rgba(234,179,8,0.25); color:#fde68a; }
     .aub-note.amber i{ color:#eab308; }
@@ -35,7 +35,7 @@
 
     /* ── Abas por SO ─────────────────────────────────────────────── */
     .os-tabs{ display:flex; gap:8px; margin:0 0 22px; flex-wrap:wrap; }
-    .os-tab{ font-family:'Inter',sans-serif; font-size:.85rem; font-weight:600; color:#94a3b8; background:#11111c; border:1px solid rgba(99,102,241,0.15); border-radius:9px; padding:9px 18px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:.15s; }
+    .os-tab{ font-family:var(--s-sans); font-size:.85rem; font-weight:600; color:#94a3b8; background:#11111c; border:1px solid rgba(99,102,241,0.15); border-radius:9px; padding:9px 18px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:.15s; }
     .os-tab:hover{ color:#e2e8f0; border-color:rgba(99,102,241,0.4); }
     .os-tab.is-active{ color:#fff; background:rgba(99,102,241,0.15); border-color:#6366f1; }
     .os-panel{ animation:aubFade .2s ease; }
@@ -48,10 +48,10 @@
 
 @section('content')
 
-    <section class="dark include-header" style="background-color:#0d0d14; min-height:100vh; position:relative; overflow:hidden;">
-        <div class="cp-hero-glow"></div>
+    <section class="s-section" style="padding-top:clamp(7rem,11vw,10rem); position:relative; overflow:hidden;">
+        <div class="s-aura"></div>
 
-        <div class="container" style="position:relative; z-index:1; padding-top:60px; padding-bottom:100px; max-width:880px;">
+        <div class="container s-prose" style="position:relative; z-index:1; max-width:880px;">
 
             <nav style="margin-bottom:32px; font-family:'JetBrains Mono',monospace; font-size:.78rem;">
                 <a href="{{ route('home') }}" style="color:#6366f1; text-decoration:none;"><i class="fa-solid fa-arrow-left me-2"></i>Início</a>
@@ -63,8 +63,8 @@
                     <i class="fa-solid fa-gauge-high" style="color:#6366f1; font-size:1.6rem;"></i>
                 </span>
                 <div>
-                    <span class="cp-eyebrow">// MONITOR DE USO DE IA</span>
-                    <h1 style="font-family:'Inter',sans-serif; font-size:2.2rem; font-weight:700; color:#f1f5f9; letter-spacing:-.02em; margin:4px 0 0;">ai<span style="color:#6366f1;">-</span>usagebar</h1>
+                    <span class="s-kicker">Monitor de uso de IA</span>
+                    <h1 style="font-family:var(--s-sans); font-size:2.2rem; font-weight:700; color:#f1f5f9; letter-spacing:-.02em; margin:4px 0 0;">ai<span style="color:#6366f1;">-</span>usagebar</h1>
                 </div>
             </header>
 
@@ -75,7 +75,7 @@
             </div>
 
             {{-- ── Intro ────────────────────────────────────────────────── --}}
-            <div style="font-family:'Inter',sans-serif; font-size:1.02rem; color:#cbd5e1; line-height:1.8; margin-bottom:30px;">
+            <div style="font-family:var(--s-sans); font-size:1.02rem; color:#cbd5e1; line-height:1.8; margin-bottom:30px;">
                 <p>O <strong style="color:#f1f5f9;">ai-usagebar</strong> mostra o quanto você já consumiu dos seus planos de IA — <strong style="color:#f1f5f9;">Anthropic Claude</strong>, <strong style="color:#f1f5f9;">OpenAI Codex</strong>, <strong style="color:#f1f5f9;">Z.AI (GLM)</strong>, <strong style="color:#f1f5f9;">OpenRouter</strong> e <strong style="color:#f1f5f9;">DeepSeek</strong> — direto na barra do seu sistema, com as barras de uso da <strong style="color:#f1f5f9;">janela de 5 horas</strong> e <strong style="color:#f1f5f9;">semanal</strong> ao lado do relógio e um menu com o detalhamento completo.</p>
                 <p style="margin-top:1rem;">É um <strong style="color:#f1f5f9;">backend rápido em Rust</strong> com quatro interfaces: o widget <strong style="color:#f1f5f9;">Waybar</strong> e um <strong style="color:#f1f5f9;">TUI de terminal</strong> (multiplataforma), a extensão de <strong style="color:#f1f5f9;">GNOME Shell</strong> (Linux), o app de <strong style="color:#f1f5f9;">menu bar</strong> (macOS) e o app de <strong style="color:#f1f5f9;">bandeja</strong> (Windows). Todas leem o mesmo <code style="color:#a5b4fc;">--json</code> do binário — a lógica de autenticação e de cada provedor mora só no Rust auditável.</p>
             </div>
@@ -100,10 +100,10 @@
                 @endphp
                 @foreach($features as [$icon, $title, $desc])
                     <div class="col-md-6">
-                        <div class="cp-glass-card h-100" style="padding:20px;">
+                        <div class="s-card h-100" style="padding:20px;">
                             <i class="{{ $icon }}" style="color:#6366f1; font-size:1.1rem;"></i>
-                            <h3 style="font-family:'Inter',sans-serif; font-size:.98rem; font-weight:600; color:#f1f5f9; margin:11px 0 5px;">{{ $title }}</h3>
-                            <p style="font-family:'Inter',sans-serif; font-size:.84rem; color:#94a3b8; line-height:1.6; margin:0;">{{ $desc }}</p>
+                            <h3 style="font-family:var(--s-sans); font-size:.98rem; font-weight:600; color:#f1f5f9; margin:11px 0 5px;">{{ $title }}</h3>
+                            <p style="font-family:var(--s-sans); font-size:.84rem; color:#94a3b8; line-height:1.6; margin:0;">{{ $desc }}</p>
                         </div>
                     </div>
                 @endforeach
@@ -271,10 +271,10 @@
 
             {{-- ── CTA ──────────────────────────────────────────────────── --}}
             <div class="d-flex gap-3 flex-wrap" style="margin-top:44px;">
-                <a href="https://github.com/samirhvbr/ai-usagebar" target="_blank" rel="noopener" class="button button-rounded button-large m-0" style="background:#6366f1; border-color:#6366f1; color:#fff; font-family:'Inter',sans-serif; font-weight:600; padding:14px 30px; box-shadow:0 4px 24px rgba(99,102,241,0.35);">
+                <a href="https://github.com/samirhvbr/ai-usagebar" target="_blank" rel="noopener" class="button button-rounded button-large m-0" style="background:#6366f1; border-color:#6366f1; color:#fff; font-family:var(--s-sans); font-weight:600; padding:14px 30px; box-shadow:0 4px 24px rgba(99,102,241,0.35);">
                     <i class="fa-brands fa-github me-2"></i>Código no GitHub
                 </a>
-                <a href="https://github.com/samirhvbr/ai-usagebar/blob/master/DESKTOP.md" target="_blank" rel="noopener" class="button button-rounded button-large button-border m-0" style="border-color:rgba(99,102,241,0.45); color:#a5b4fc; font-family:'Inter',sans-serif; font-weight:600; padding:14px 30px;">
+                <a href="https://github.com/samirhvbr/ai-usagebar/blob/master/DESKTOP.md" target="_blank" rel="noopener" class="button button-rounded button-large button-border m-0" style="border-color:rgba(99,102,241,0.45); color:#a5b4fc; font-family:var(--s-sans); font-weight:600; padding:14px 30px;">
                     <i class="fa-solid fa-book me-2"></i>Guia desktop completo
                 </a>
             </div>

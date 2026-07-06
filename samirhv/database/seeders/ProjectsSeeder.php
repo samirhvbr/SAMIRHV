@@ -34,8 +34,8 @@ class ProjectsSeeder extends Seeder
             ['slug' => 'sshvterm'],
             [
                 'title' => 'SShvTerm',
-                'description' => 'Terminal SSH/web com a cara do samirhv. Acesse pelo site oficial.',
-                'category' => 'Terminal Web',
+                'description' => 'Cliente SSH/SFTP desktop e multiplataforma, com sync zero-knowledge. Agora com um agente de IA que opera o terminal — propõe e executa comandos no PTY visível, sob uma política allow · ask · deny que você controla. Acesse pelo site oficial.',
+                'category' => 'Cliente SSH',
                 'icon' => 'fa-solid fa-terminal',
                 'external_url' => 'https://sshvterm.com',
                 'redirect_to_site' => true, // link puro: abre o site direto
