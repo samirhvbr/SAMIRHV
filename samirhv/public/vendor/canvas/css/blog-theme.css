@@ -311,6 +311,21 @@ a.s-card:hover, .s-card--hover:hover {
 }
 .s-aura--center::before { top: -40%; left: 50%; right: auto; transform: translateX(-50%); opacity: 0.7; }
 
+/* ── Dot-grid animado (restaurado a pedido: bolinhas índigo driftando sobre a aura) ── */
+.s-hero__dots {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.35;
+  pointer-events: none;
+  animation: s-dot-drift 8s ease-in-out infinite;
+}
+@keyframes s-dot-drift {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+@media (prefers-reduced-motion: reduce) { .s-hero__dots { animation: none; } }
+
 /* ── Header retematizado ────────────────────────────────────────────────── */
 #header {
   --cnvs-header-bg: transparent;

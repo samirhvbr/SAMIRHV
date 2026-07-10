@@ -8,6 +8,14 @@
     {{-- ═══ HERO ═══ --}}
     <section class="s-hero">
         <div class="s-aura"></div>
+        <svg class="s-hero__dots" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" aria-hidden="true">
+            <defs>
+                <pattern id="s-dots" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+                    <circle cx="1.5" cy="1.5" r="1.5" fill="#6366f1"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#s-dots)"/>
+        </svg>
         <div class="container" style="position:relative; z-index:1;">
             <div class="row align-items-center g-5">
 

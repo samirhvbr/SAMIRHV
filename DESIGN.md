@@ -63,7 +63,8 @@ Escala fluida (`clamp()`, ratio ≥ 1.25):
 
 ## Motion
 
-- **Removidos:** marquee, cursor piscando, dot-drift, border-shimmer.
+- **Removidos:** marquee, cursor piscando, border-shimmer.
+- **Dot-grid do hero:** restaurado a pedido (0.4.1) — bolinhas índigo (`#6366f1`, grade 24px, opacity 0.35) driftando 12px em 8s sobre a aura; desligado em `prefers-reduced-motion`.
 - **Page-load:** um reveal escalonado sutil (opacity + translateY pequeno), ease-out-expo; stagger só onde há lista, e sempre sobre conteúdo já visível por padrão.
 - **Hover:** borda/opacity/translateY ≤ 2px; sem bounce/elastic.
 - `prefers-reduced-motion: reduce` → tudo vira crossfade/instantâneo.
