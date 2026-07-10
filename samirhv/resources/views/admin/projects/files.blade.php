@@ -224,7 +224,15 @@
         if (n.includes('arm64') || n.includes('aarch64')) arch = 'arm64';
         else if (n.includes('amd64') || n.includes('x86_64') || n.includes('x64')) arch = 'x64';
         else if (n.includes('universal')) arch = 'universal';
-        return { os: os, arch: arch, file_type: type };
+        // Versão: primeiro X.Y(.Z) no nome (o ponto exige — não casa "x86_64").
+        const vm = (name || '').match(/\d+\.\d+(?:\.\d+)?/);
+        const version = vm ? vm[0] : '';
+        // Nome do produto: trecho antes da versão (separadores viram espaço).
+        const base = (name || '').replace(/\.[^.]+$/, '');
+        const cut = version ? base.indexOf(version) : -1;
+        const before = cut > 0 ? base.slice(0, cut) : (version ? '' : base);
+        const label = before.replace(/[_\-.]+/g, ' ').trim();
+        return { os: os, arch: arch, file_type: type, version: version, label: label };
     }
 
     document.getElementById('file').addEventListener('change', function () {
@@ -233,9 +241,13 @@
         const osEl = document.getElementById('os');
         const archEl = document.getElementById('arch');
         const typeEl = document.getElementById('file_type');
+        const labelEl = document.getElementById('label');
+        const versionEl = document.getElementById('version');
         if (osEl && info.os) osEl.value = info.os;
         if (archEl && info.arch) archEl.value = info.arch;
         if (typeEl && info.file_type) typeEl.value = info.file_type;
+        if (labelEl && info.label) labelEl.value = info.label;
+        if (versionEl && info.version) versionEl.value = info.version;
     });
 
     form.addEventListener('submit', function (e) {

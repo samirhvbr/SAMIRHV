@@ -13,7 +13,7 @@ namespace App\Support;
 final class FilenameInspector
 {
     /**
-     * @return array{os: ?string, arch: ?string, file_type: ?string}
+     * @return array{os: ?string, arch: ?string, file_type: ?string, version: ?string, name: ?string}
      */
     public static function inspect(string $name): array
     {
@@ -46,6 +46,17 @@ final class FilenameInspector
             default => null,
         };
 
-        return ['os' => $os, 'arch' => $arch, 'file_type' => $fileType];
+        // Versão: primeiro X.Y(.Z) no nome (o ponto exige, então não casa "x86_64").
+        $version = preg_match('/\d+\.\d+(?:\.\d+)?/', $name, $m) ? $m[0] : null;
+
+        // Nome do produto: trecho antes da versão; separadores viram espaço.
+        $base = pathinfo($name, PATHINFO_FILENAME);
+        $before = ($version !== null && ($pos = strpos($base, $version)) !== false)
+            ? substr($base, 0, $pos)
+            : ($version !== null ? '' : $base);
+        $label = trim((string) preg_replace('/[_\-.]+/', ' ', $before));
+        $label = $label !== '' ? $label : null;
+
+        return ['os' => $os, 'arch' => $arch, 'file_type' => $fileType, 'version' => $version, 'name' => $label];
     }
 }

@@ -51,9 +51,9 @@ class FileIngestService
         $inferred = FilenameInspector::inspect($originalName);
 
         $payload = [
-            'label' => $opts['label'] ?? pathinfo($originalName, PATHINFO_FILENAME),
+            'label' => $opts['label'] ?? ($inferred['name'] ?? pathinfo($originalName, PATHINFO_FILENAME)),
             'original_name' => $originalName,
-            'version' => $opts['version'] ?? null,
+            'version' => $opts['version'] ?? $inferred['version'],
             'size' => $size,
             'sha256' => $sha256,
             'is_available' => true,
