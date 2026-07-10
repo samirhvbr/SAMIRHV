@@ -21,7 +21,15 @@ class ProjectFileController extends Controller
 
     public function index(Project $project): View
     {
-        $files = $project->files()->orderBy('label')->get();
+        // Build mais recente no topo: versão desc (semver-aware, então 0.10 > 0.9);
+        // empate cai para data efetiva (released_at ?? created_at) desc e depois rótulo.
+        $files = $project->files()->get()
+            ->sort(fn (ProjectFile $a, ProjectFile $b) => version_compare(
+                ltrim((string) $b->version, 'vV') ?: '0',
+                ltrim((string) $a->version, 'vV') ?: '0',
+            ) ?: ($b->effective_date <=> $a->effective_date)
+               ?: strcmp((string) $a->label, (string) $b->label))
+            ->values();
 
         return view('admin.projects.files', compact('project', 'files'));
     }
