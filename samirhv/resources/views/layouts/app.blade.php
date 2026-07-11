@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="{{ asset('vendor/canvas/style.css') }}">
     <link rel="stylesheet" href="{{ asset('vendor/canvas/css/font-icons.css') }}">
     <link rel="stylesheet" href="{{ asset('vendor/canvas/css/blog-theme.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendor/canvas/css/custom.css') }}">
 
     @stack('styles')
 
@@ -52,8 +53,12 @@
                             </button>
                         </div>
 
-                        <div class="col-lg-5 d-lg-flex justify-content-end order-lg-last">
-                            <div class="header-misc">
+                        <div class="col-lg-5 d-lg-flex justify-content-end order-lg-last align-items-center gap-3">
+                            <div class="header-misc d-none d-lg-flex align-items-center gap-2">
+                                <a href="{{ route('home') }}" class="s-flink" style="font-size: 0.82rem; color: var(--s-muted); display: inline-flex; align-items: center; gap: 5px; transition: color 0.18s;" onmouseover="this.style.color='var(--s-ink-2)'" onmouseout="this.style.color='var(--s-muted)'">
+                                    <i class="fa-solid fa-house" style="font-size: 0.7rem;"></i> Início
+                                </a>
+                                <span style="width: 3px; height: 3px; border-radius: 50%; background: rgba(99,102,241,0.3);"></span>
                                 <a href="{{ route('admin.dashboard') }}" class="s-btn s-btn--ghost s-btn--sm m-0">
                                     <span>Admin</span> <i class="bi-arrow-right d-none d-lg-inline"></i>
                                 </a>
@@ -104,31 +109,44 @@
         <footer id="footer" class="dark">
             <div class="container">
                 <div class="footer-widgets-wrap py-5">
-                    <div class="row g-4">
+                    <div class="row g-4 g-lg-5">
+
+                        <!-- Brand -->
                         <div class="col-12 col-lg-5">
-                            <p class="s-logo" style="font-size:1.5rem; margin-bottom:1rem;">samirhv<b>.</b></p>
-                            <p class="s-body s-muted" style="max-width:34ch; font-size:0.94rem;">Projetos e ferramentas de Samir Hanna Verza, disponibilizados para download. Tecnologia, desenvolvimento e Linux.</p>
+                            <a href="{{ route('home') }}" style="text-decoration: none;">
+                                <p class="s-logo" style="font-size: 1.6rem; margin-bottom: 14px;">samirhv<b>.</b></p>
+                            </a>
+                            <p class="s-body s-muted" style="max-width: 36ch; font-size: 0.94rem; line-height: 1.75;">
+                                Projetos e ferramentas de Samir Hanna Verza, disponibilizados para download.
+                                Tecnologia, desenvolvimento e Linux.
+                            </p>
                             <div class="d-flex gap-2 mt-3">
-                                <a href="https://github.com/samirhvbr" target="_blank" rel="noopener" class="s-icon" style="width:40px;height:40px;font-size:1rem;" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
-                                <a href="https://instagram.com/samirhvbr" target="_blank" rel="noopener" class="s-icon" style="width:40px;height:40px;font-size:1rem;" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                                <a href="https://www.linkedin.com/in/samirhv/" target="_blank" rel="noopener" class="s-icon" style="width:40px;height:40px;font-size:1rem;" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+                                <a href="https://github.com/samirhvbr" target="_blank" rel="noopener" class="s-icon" style="width:42px;height:42px;font-size:1.05rem;" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+                                <a href="https://instagram.com/samirhvbr" target="_blank" rel="noopener" class="s-icon" style="width:42px;height:42px;font-size:1.05rem;" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                                <a href="https://www.linkedin.com/in/samirhv/" target="_blank" rel="noopener" class="s-icon" style="width:42px;height:42px;font-size:1.05rem;" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
                             </div>
                         </div>
+
+                        <!-- Navegação -->
                         <div class="col-6 col-lg-3 offset-lg-1">
                             <h4>Navegação</h4>
-                            <ul class="list-unstyled mb-0" style="line-height:2.1;">
+                            <ul class="list-unstyled mb-0" style="display: flex; flex-direction: column; gap: 10px;">
                                 <li><a href="{{ route('home') }}" class="s-flink">Início</a></li>
                                 <li><a href="{{ route('downloads') }}" class="s-flink">Downloads</a></li>
+                                <li><a href="{{ route('admin.dashboard') }}" class="s-flink">Painel Admin</a></li>
                             </ul>
                         </div>
+
+                        <!-- Contato -->
                         <div class="col-6 col-lg-3">
                             <h4>Contato</h4>
-                            <ul class="list-unstyled mb-0" style="line-height:2.1;">
+                            <ul class="list-unstyled mb-0" style="display: flex; flex-direction: column; gap: 10px;">
                                 <li><a href="https://github.com/samirhvbr" target="_blank" rel="noopener" class="s-flink">GitHub</a></li>
                                 <li><a href="https://instagram.com/samirhvbr" target="_blank" rel="noopener" class="s-flink">Instagram</a></li>
                                 <li><a href="https://www.linkedin.com/in/samirhv/" target="_blank" rel="noopener" class="s-flink">LinkedIn</a></li>
                             </ul>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -136,12 +154,14 @@
             <div id="copyrights" class="dark">
                 <div class="container">
                     <div class="row align-items-center justify-content-between py-3">
-                        <div class="col-md-6 s-meta">
+                        <div class="col-md-6 s-meta" style="font-size: 0.8rem;">
                             &copy; {{ date('Y') }} Samirhv. Todos os direitos reservados.
                         </div>
-                        <div class="col-md-6 d-flex justify-content-md-end mt-2 mt-md-0 s-meta">
+                        <div class="col-md-6 d-flex justify-content-md-end mt-2 mt-md-0 align-items-center gap-3 s-meta" style="font-size: 0.8rem;">
+                            <span style="color: var(--s-faint);">feito com Laravel + Debian</span>
+                            <span style="color: var(--s-faint);">·</span>
                             <a href="{{ route('home') }}" class="s-flink">Início</a>
-                            <span style="margin:0 10px; color:var(--s-faint);">·</span>
+                            <span style="color: var(--s-faint);">·</span>
                             <a href="{{ route('downloads') }}" class="s-flink">Downloads</a>
                         </div>
                     </div>

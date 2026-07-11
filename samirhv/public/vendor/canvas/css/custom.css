@@ -1,7 +1,201 @@
 /* ----------------------------------------------------------------
-	Custom CSS
-
-	Add all your Custom Styled CSS here for New Styles or
-	Overwriting Default Theme Styles for Better Handling Updates
+   SAMIRHV — Custom Enhancements
+   Complementa o blog-theme.css existente com refinamentos
+   de layout, transições e disposição de componentes.
 -----------------------------------------------------------------*/
 
+/* ── Smooth scroll global ── */
+html { scroll-behavior: smooth; }
+
+/* ── Links: underline animado ── */
+a { transition: color 0.18s ease; }
+a.s-flink {
+    position: relative;
+    text-decoration: none;
+}
+a.s-flink::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 0; width: 0;
+    height: 1px;
+    background: var(--s-accent-ink);
+    transition: width 0.25s ease;
+}
+a.s-flink:hover::after { width: 100%; }
+
+/* ── Cards: hover aprimorado ── */
+.s-card {
+    position: relative;
+    overflow: hidden;
+}
+.s-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--s-accent), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+a.s-card:hover::before,
+.s-card--hover:hover::before { opacity: 1; }
+
+/* ── Botões: micro-interações ── */
+.s-btn {
+    position: relative;
+    overflow: hidden;
+}
+.s-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.08), transparent);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+.s-btn:hover::after { opacity: 1; }
+.s-btn:active { transform: translateY(0) scale(0.98); }
+
+/* ── Ícones sociais do footer ── */
+.s-icon:not(.s-icon--lg):not(.s-icon--lg) {
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+.s-icon:hover {
+    transform: translateY(-3px) scale(1.06);
+    border-color: var(--s-line-2);
+    background: var(--s-accent-soft-2);
+}
+
+/* ── Tech row: hover em cada item ── */
+.s-techrow span {
+    padding: 4px 10px;
+    border-radius: 6px;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+.s-techrow span:hover {
+    background: rgba(99,102,241,0.08);
+    color: var(--s-ink-2);
+}
+
+/* ── Terminal: glow sutil no hover ── */
+.s-term {
+    transition: box-shadow 0.35s ease, border-color 0.35s ease;
+}
+.s-term:hover {
+    border-color: rgba(99,102,241,0.45);
+    box-shadow: 0 40px 90px -40px rgba(0,0,0,0.95),
+                0 0 60px -20px rgba(99,102,241,0.15),
+                inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+/* ── Tags: hover ativo ── */
+.s-tag {
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.s-tag:hover {
+    border-color: var(--s-line-2);
+    background: rgba(150,155,185,0.1);
+}
+
+/* ── Grid de projetos: stagger suave ── */
+.s-grid > *:nth-child(2) { animation-delay: 0.05s; }
+.s-grid > *:nth-child(3) { animation-delay: 0.1s; }
+.s-grid > *:nth-child(4) { animation-delay: 0.15s; }
+.s-grid > *:nth-child(5) { animation-delay: 0.2s; }
+.s-grid > *:nth-child(6) { animation-delay: 0.25s; }
+
+/* ── Featured card: destaque visual ── */
+.s-featured {
+    position: relative;
+}
+.s-featured::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: calc(var(--s-r) + 1px);
+    background: linear-gradient(135deg, var(--s-accent-soft-2), transparent 50%, var(--s-accent-soft));
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.s-featured:hover::before { opacity: 1; }
+
+/* ── Points (feature list): ícone com animação ── */
+.s-points .n {
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+.s-points li:hover .n {
+    transform: scale(1.08);
+    background: var(--s-accent-soft-2);
+}
+
+/* ── Kicker: pulse sutil ── */
+.s-kicker::before {
+    animation: s-kicker-pulse 3s ease-in-out infinite;
+}
+@keyframes s-kicker-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ── Header sticky: transição suave ── */
+#header-wrap {
+    transition: background 0.3s ease, backdrop-filter 0.3s ease,
+                border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ── Dropdown: melhoria de entrada ── */
+@media (min-width: 992px) {
+    .s-dd a {
+        transition: background-color 0.15s ease, transform 0.15s ease;
+        transform-origin: center;
+    }
+    .s-dd a:hover {
+        transform: translateX(3px);
+    }
+}
+
+/* ── Footer: colunas com fade-in ── */
+#footer .row > div {
+    animation: s-rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+#footer .row > div:nth-child(1) { animation-delay: 0.05s; }
+#footer .row > div:nth-child(2) { animation-delay: 0.12s; }
+#footer .row > div:nth-child(3) { animation-delay: 0.19s; }
+
+/* ── Focus visible global (acessibilidade) ── */
+:focus-visible {
+    outline: 2px solid var(--s-accent);
+    outline-offset: 3px;
+}
+
+/* ── Seleção customizada ── */
+::selection {
+    background: rgba(99, 102, 241, 0.28);
+    color: #fff;
+}
+
+/* ── Responsive refinements ── */
+@media (max-width: 767.98px) {
+    .s-hero__trust {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .s-techrow {
+        justify-content: center;
+    }
+    .s-grid {
+        grid-template-columns: 1fr;
+    }
+    .s-featured {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ── Print: esconder decoracao ── */
+@media print {
+    .s-hero__dots, .s-aura, #header, #footer,
+    .s-term__bar, .s-term__foot { display: none !important; }
+    body { background: #fff; color: #000; }
+    .s-card { border: 1px solid #ccc; break-inside: avoid; }
+}

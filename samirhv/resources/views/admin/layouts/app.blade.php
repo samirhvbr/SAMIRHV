@@ -9,79 +9,192 @@
     <link rel="stylesheet" href="{{ asset('vendor/canvas/css/font-icons.css') }}">
     <style>
         :root{
-            --bg:#0d0d14; --panel:#14141f; --panel-2:#11111c; --line:rgba(99,102,241,.15);
-            --txt:#e2e8f0; --muted:#94a3b8; --dim:#64748b; --accent:#6366f1; --accent-soft:rgba(99,102,241,.12);
+            --bg:#0a0a11; --panel:#111119; --panel-2:#0d0d15; --line:rgba(99,102,241,.12);
+            --line-hover:rgba(99,102,241,.28);
+            --txt:#e2e8f0; --muted:#94a3b8; --dim:#64748b; --accent:#6366f1;
+            --accent-soft:rgba(99,102,241,.10); --accent-soft-2:rgba(99,102,241,.16);
             --ok:#22c55e; --danger:#ef4444; --warn:#f59e0b;
+            --font:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+            --radius-sm:7px; --radius-md:10px; --radius-lg:14px;
+            --sidebar-w: 240px;
         }
         *{box-sizing:border-box}
-        body{margin:0;background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:14px}
+        body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--font);font-size:14px;-webkit-font-smoothing:antialiased}
         a{color:inherit}
+
         .layout{display:flex;min-height:100vh}
-        /* Sidebar */
-        .sidebar{width:236px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--line);padding:22px 16px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column}
-        .sidebar .brand{font-family:'JetBrains Mono',monospace;font-size:1.35rem;font-weight:700;letter-spacing:-.02em;color:#f1f5f9;margin:4px 8px 24px}
-        .sidebar .brand span{color:var(--accent)}
-        .nav-link{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:9px;color:var(--muted);text-decoration:none;font-weight:500;margin-bottom:3px}
-        .nav-link i{width:18px;text-align:center;font-size:.95rem}
+
+        /* ── Sidebar ── */
+        .sidebar{
+            width:var(--sidebar-w);flex-shrink:0;
+            background:var(--panel);border-right:1px solid var(--line);
+            padding:20px 14px;
+            position:sticky;top:0;height:100vh;display:flex;flex-direction:column;
+            z-index:100;
+        }
+        .sidebar-brand{
+            display:flex;align-items:center;gap:10px;
+            padding:2px 8px 18px;margin-bottom:6px;
+        }
+        .sidebar-brand .brand-icon{
+            width:34px;height:34px;border-radius:9px;
+            background:linear-gradient(135deg, #6366f1, #818cf8);
+            display:flex;align-items:center;justify-content:center;
+            font-size:0.78rem;font-weight:700;color:#fff;
+            font-family:'JetBrains Mono',monospace;letter-spacing:-.02em;
+            flex-shrink:0;
+        }
+        .sidebar-brand .brand-text{
+            font-family:'JetBrains Mono',monospace;font-size:1.15rem;
+            font-weight:700;color:#f1f5f9;letter-spacing:-.02em;line-height:1;
+        }
+        .sidebar-brand .brand-text span{color:var(--accent)}
+
+        .nav-section{
+            font-size:.62rem;letter-spacing:.13em;text-transform:uppercase;
+            color:var(--dim);padding:14px 8px 7px;font-weight:600;
+        }
+
+        .nav-link{
+            display:flex;align-items:center;gap:10px;
+            padding:9px 11px;border-radius:var(--radius-sm);
+            color:var(--muted);text-decoration:none;font-weight:500;
+            margin-bottom:2px;font-size:.85rem;
+            transition:all .15s ease;
+        }
+        .nav-link i{width:17px;text-align:center;font-size:.82rem;opacity:.7;transition:opacity .15s}
         .nav-link:hover{background:var(--accent-soft);color:#c7d2fe}
-        .nav-link.active{background:var(--accent-soft);color:#c7d2fe}
-        .sidebar .spacer{flex:1}
-        .sidebar .who{font-size:.76rem;color:var(--dim);margin:0 8px 10px;word-break:break-all}
-        /* Main */
+        .nav-link:hover i{opacity:1}
+        .nav-link.active{background:var(--accent-soft);color:#a5b4fc}
+        .nav-link.active i{opacity:1}
+
+        .sidebar-spacer{flex:1}
+
+        .sidebar-user{
+            display:flex;align-items:center;gap:9px;
+            padding:10px 8px;margin-top:6px;
+            border-top:1px solid var(--line);
+        }
+        .sidebar-user-avatar{
+            width:30px;height:30px;border-radius:50%;
+            background:linear-gradient(135deg, #6366f1, #818cf8);
+            display:flex;align-items:center;justify-content:center;
+            font-size:.68rem;font-weight:700;color:#fff;flex-shrink:0;
+        }
+        .sidebar-user-info{flex:1;min-width:0}
+        .sidebar-user-name{font-size:.78rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .sidebar-user-email{font-size:.66rem;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+        /* ── Main ── */
         .main{flex:1;min-width:0;display:flex;flex-direction:column}
-        .topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--line)}
-        .topbar h1{font-size:1.3rem;font-weight:700;margin:0;color:#f1f5f9}
-        .content{padding:28px;max-width:1180px;width:100%}
-        /* Alerts */
-        .admin-alert{border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:.9rem}
-        .admin-alert-ok{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#86efac}
-        .admin-alert-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
-        .admin-alert-warn{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:#fcd34d}
-        /* Cards */
-        .admin-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px;margin-bottom:22px}
-        .admin-card h2{font-size:1rem;font-weight:700;margin:0 0 16px;color:#f1f5f9}
+        .topbar{
+            display:flex;align-items:center;justify-content:space-between;
+            padding:16px 28px;
+            border-bottom:1px solid var(--line);
+            background:rgba(17,17,25,.85);
+            backdrop-filter:saturate(140%) blur(12px);
+            -webkit-backdrop-filter:saturate(140%) blur(12px);
+            position:sticky;top:0;z-index:50;
+        }
+        .topbar h1{font-size:1.15rem;font-weight:700;margin:0;color:#f1f5f9;letter-spacing:-.01em}
+        .content{padding:28px;max-width:1200px;width:100%}
+
+        /* ── Alerts ── */
+        .admin-alert{
+            border-radius:var(--radius-md);padding:13px 17px;
+            margin-bottom:22px;font-size:.88rem;
+            display:flex;align-items:center;gap:9px;
+        }
+        .admin-alert-ok{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);color:#4ade80}
+        .admin-alert-error{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:#f87171}
+        .admin-alert-warn{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);color:#facc15}
+
+        /* ── Cards ── */
+        .admin-card{
+            background:var(--panel);border:1px solid var(--line);
+            border-radius:var(--radius-lg);padding:24px;margin-bottom:22px;
+            transition:border-color .2s ease;
+        }
+        .admin-card:hover{border-color:var(--line-hover)}
+        .admin-card h2{font-size:1.02rem;font-weight:700;margin:0 0 16px;color:#f1f5f9}
         .admin-card .card-sub{font-size:.78rem;color:var(--dim);font-weight:500}
-        /* Stats */
-        .admin-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
-        .admin-stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
-        .admin-stat .label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);font-weight:600}
-        .admin-stat .value{font-size:1.9rem;font-weight:700;color:#f1f5f9;margin-top:6px;font-family:'JetBrains Mono',monospace}
-        /* Tables */
-        .admin-table{width:100%;border-collapse:collapse;font-size:.85rem}
-        .admin-table th{text-align:left;padding:10px 12px;color:var(--dim);font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--line)}
-        .admin-table td{padding:11px 12px;border-bottom:1px solid rgba(99,102,241,.07);vertical-align:middle}
-        .admin-table tr:hover td{background:rgba(99,102,241,.04)}
+
+        /* ── Stats ── */
+        .admin-stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-bottom:24px}
+        .admin-stat{
+            background:var(--panel);border:1px solid var(--line);
+            border-radius:var(--radius-md);padding:20px 22px;
+            position:relative;overflow:hidden;
+            transition:all .2s ease;
+        }
+        .admin-stat:hover{border-color:var(--line-hover);transform:translateY(-2px)}
+        .admin-stat::after{
+            content:'';position:absolute;top:0;left:0;right:0;
+            height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);
+            opacity:0;transition:opacity .2s ease;
+        }
+        .admin-stat:hover::after{opacity:1}
+        .admin-stat .label{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);font-weight:600}
+        .admin-stat .value{font-size:1.95rem;font-weight:700;color:#f1f5f9;margin-top:8px;font-family:'JetBrains Mono',monospace}
+
+        /* ── Tables ── */
+        .admin-table{width:100%;border-collapse:collapse;font-size:.86rem}
+        .admin-table th{
+            text-align:left;padding:11px 14px;color:var(--dim);font-weight:600;
+            font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;
+            border-bottom:1px solid var(--line);
+            background:rgba(0,0,0,.15)
+        }
+        .admin-table td{padding:12px 14px;border-bottom:1px solid rgba(99,102,241,.06);vertical-align:middle}
+        .admin-table tr:hover td{background:rgba(99,102,241,.03)}
         .admin-table code{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:#a5b4fc}
         .admin-table .muted{color:var(--dim)}
         .an-bot-row td{opacity:.55}
-        /* Badges */
-        .badge{display:inline-block;font-size:.68rem;font-weight:600;padding:3px 9px;border-radius:5px;font-family:'JetBrains Mono',monospace}
-        .badge-accent{background:var(--accent-soft);color:#c7d2fe;border:1px solid rgba(99,102,241,.25)}
-        .badge-ok{background:rgba(34,197,94,.12);color:#86efac;border:1px solid rgba(34,197,94,.25)}
-        .badge-danger{background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.25)}
-        .badge-warn{background:rgba(245,158,11,.12);color:#fcd34d;border:1px solid rgba(245,158,11,.25)}
-        .badge-muted{background:rgba(148,163,184,.12);color:#cbd5e1;border:1px solid rgba(148,163,184,.2)}
-        /* Buttons */
-        .admin-btn{display:inline-flex;align-items:center;gap:7px;background:var(--panel-2);border:1px solid var(--line);color:var(--txt);padding:8px 15px;border-radius:8px;font-size:.84rem;font-weight:600;text-decoration:none;cursor:pointer}
-        .admin-btn:hover{border-color:rgba(99,102,241,.4)}
+
+        /* ── Badges ── */
+        .badge{display:inline-block;font-size:.68rem;font-weight:600;padding:3px 10px;border-radius:6px;font-family:'JetBrains Mono',monospace}
+        .badge-accent{background:var(--accent-soft);color:#c7d2fe;border:1px solid rgba(99,102,241,.22)}
+        .badge-ok{background:rgba(34,197,94,.1);color:#4ade80;border:1px solid rgba(34,197,94,.22)}
+        .badge-danger{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.22)}
+        .badge-warn{background:rgba(245,158,11,.1);color:#fcd34d;border:1px solid rgba(245,158,11,.22)}
+        .badge-muted{background:rgba(148,163,184,.08);color:#cbd5e1;border:1px solid rgba(148,163,184,.15)}
+
+        /* ── Buttons ── */
+        .admin-btn{
+            display:inline-flex;align-items:center;gap:7px;
+            background:var(--panel-2);border:1px solid var(--line);
+            color:var(--txt);padding:8px 16px;border-radius:var(--radius-sm);
+            font-size:.84rem;font-weight:600;text-decoration:none;cursor:pointer;
+            transition:all .15s ease;
+        }
+        .admin-btn:hover{border-color:var(--line-hover);transform:translateY(-1px)}
         .admin-btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
-        .admin-btn-primary:hover{background:#4f46e5}
-        .admin-btn-danger{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:#fca5a5}
-        .admin-btn-danger:hover{background:rgba(239,68,68,.18)}
-        .admin-btn-sm{padding:5px 11px;font-size:.78rem}
-        /* Forms */
+        .admin-btn-primary:hover{background:#4f46e5;box-shadow:0 4px 16px rgba(99,102,241,.25)}
+        .admin-btn-danger{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.25);color:#fca5a5}
+        .admin-btn-danger:hover{background:rgba(239,68,68,.15)}
+        .admin-btn-sm{padding:5px 11px;font-size:.77rem}
+
+        /* ── Forms ── */
         .form-row{margin-bottom:18px}
-        .form-row label{display:block;font-size:.82rem;font-weight:600;color:#cbd5e1;margin-bottom:7px}
-        .form-row input[type=text],.form-row input[type=number],.form-row input[type=password],.form-row input[type=file],.form-row textarea,.form-row select{
-            width:100%;background:var(--bg);border:1px solid rgba(99,102,241,.22);color:var(--txt);border-radius:8px;padding:10px 12px;font-size:.9rem;outline:none;font-family:inherit}
+        .form-row label{display:block;font-size:.82rem;font-weight:600;color:#cbd5e1;margin-bottom:7px;letter-spacing:.01em}
+        .form-row input[type=text],.form-row input[type=number],.form-row input[type=password],.form-row input[type=file],
+        .form-row textarea,.form-row select{
+            width:100%;background:var(--bg);border:1px solid rgba(99,102,241,.2);
+            color:var(--txt);border-radius:var(--radius-sm);padding:10px 13px;
+            font-size:.9rem;outline:none;font-family:inherit;
+            transition:border-color .15s ease, box-shadow .15s ease;
+        }
         .form-row textarea{min-height:120px;resize:vertical}
-        .form-row input:focus,.form-row textarea:focus,.form-row select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.16)}
+        .form-row input:focus,.form-row textarea:focus,.form-row select:focus{
+            border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.12)
+        }
         .form-row .hint{font-size:.74rem;color:var(--dim);margin-top:6px}
-        .form-row .err{color:#fca5a5;font-size:.78rem;margin-top:6px}
+        .form-row .err{color:#f87171;font-size:.76rem;margin-top:6px}
         .form-check{display:flex;align-items:center;gap:9px;font-size:.88rem;color:#cbd5e1}
         .filters{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:18px}
         .filters .form-row{margin:0;min-width:150px}
-        /* Analytics charts (CSS puro) */
+
+        /* ── Analytics (CSS puro) ── */
         .an-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
         .an-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
         .an-chart{display:flex;align-items:flex-end;gap:5px;height:120px;padding-top:8px}
@@ -95,7 +208,7 @@
         .an-hbar{height:100%;background:linear-gradient(90deg,var(--accent),rgba(99,102,241,.4));border-radius:5px}
         .an-hbar-row .val{width:42px;text-align:right;font-family:'JetBrains Mono',monospace;color:var(--dim);font-size:.76rem}
         .an-list{list-style:none;margin:0;padding:0}
-        .an-list li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid rgba(99,102,241,.07);font-size:.84rem}
+        .an-list li{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid rgba(99,102,241,.07);font-size:.84rem}
         .an-list li:last-child{border-bottom:none}
         .an-list .total{font-family:'JetBrains Mono',monospace;color:#c7d2fe}
         .chips{display:flex;flex-wrap:wrap;gap:8px}
@@ -104,8 +217,29 @@
         .tabs{display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap}
         .pagination{margin-top:16px}
         .pagination a,.pagination span{color:var(--muted)}
-        @media(max-width:900px){.admin-stats-grid,.an-grid-3,.an-grid-2{grid-template-columns:1fr 1fr}.sidebar{width:64px}.sidebar .brand,.nav-link span,.sidebar .who{display:none}}
-        @media(max-width:560px){.admin-stats-grid,.an-grid-3,.an-grid-2{grid-template-columns:1fr}}
+
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar{width:6px;height:6px}
+        ::-webkit-scrollbar-track{background:transparent}
+        ::-webkit-scrollbar-thumb{background:rgba(99,102,241,.25);border-radius:3px}
+        ::-webkit-scrollbar-thumb:hover{background:rgba(99,102,241,.4)}
+
+        @media(max-width:900px){
+            .admin-stats-grid,.an-grid-3,.an-grid-2{grid-template-columns:1fr 1fr}
+            .sidebar{width:64px}
+            .sidebar .brand-text,.nav-link span,.sidebar-user-info{display:none}
+            .sidebar-brand .brand-icon{width:30px;height:30px;font-size:.72rem}
+            .sidebar-brand{justify-content:center;padding:14px 4px 18px}
+            .nav-section{display:none}
+            .nav-link{justify-content:center;padding:10px 6px}
+            .sidebar-user{justify-content:center;padding:10px 4px}
+            .sidebar-user-avatar{width:26px;height:26px;font-size:.62rem}
+        }
+        @media(max-width:560px){
+            .admin-stats-grid,.an-grid-3,.an-grid-2{grid-template-columns:1fr}
+            .topbar{padding:14px 16px}
+            .content{padding:18px 14px}
+        }
     </style>
     @stack('styles')
 </head>
@@ -113,19 +247,59 @@
 @php $r = request()->route()?->getName(); @endphp
 <div class="layout">
     <aside class="sidebar">
-        <div class="brand">samirhv<span>.</span></div>
-        <a href="{{ route('admin.dashboard') }}" class="nav-link {{ $r === 'admin.dashboard' ? 'active' : '' }}"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
-        <a href="{{ route('admin.projects.index') }}" class="nav-link {{ str_starts_with((string) $r, 'admin.projects') ? 'active' : '' }}"><i class="fa-solid fa-folder-open"></i><span>Projetos</span></a>
-        <a href="{{ route('admin.audit.index') }}" class="nav-link {{ $r === 'admin.audit.index' ? 'active' : '' }}"><i class="fa-solid fa-chart-line"></i><span>Auditoria</span></a>
-        <a href="{{ route('admin.access-audit.index') }}" class="nav-link {{ $r === 'admin.access-audit.index' ? 'active' : '' }}"><i class="fa-solid fa-user-shield"></i><span>Aud. de Acesso</span></a>
-        <a href="{{ route('admin.ai-memory.dashboard') }}" class="nav-link {{ str_starts_with((string) $r, 'admin.ai-memory') ? 'active' : '' }}"><i class="fa-solid fa-brain"></i><span>AI-MEMORY</span></a>
-        <a href="{{ route('admin.profile') }}" class="nav-link {{ $r === 'admin.profile' ? 'active' : '' }}"><i class="fa-solid fa-gear"></i><span>Perfil</span></a>
-        <div class="spacer"></div>
-        <div class="who">{{ auth()->user()?->email }}</div>
-        <a href="{{ route('home') }}" class="nav-link" target="_blank"><i class="fa-solid fa-up-right-from-square"></i><span>Ver site</span></a>
+        <div class="sidebar-brand">
+            <div class="brand-icon">S81</div>
+            <div class="brand-text">samirhv<span>.</span></div>
+        </div>
+
+        <nav>
+            <div class="nav-section">Geral</div>
+            <a href="{{ route('admin.dashboard') }}" class="nav-link {{ $r === 'admin.dashboard' ? 'active' : '' }}">
+                <i class="fa-solid fa-gauge-high"></i><span>Dashboard</span>
+            </a>
+
+            <div class="nav-section">Conteúdo</div>
+            <a href="{{ route('admin.projects.index') }}" class="nav-link {{ str_starts_with((string) $r, 'admin.projects') ? 'active' : '' }}">
+                <i class="fa-solid fa-folder-open"></i><span>Projetos</span>
+            </a>
+
+            <div class="nav-section">Monitoramento</div>
+            <a href="{{ route('admin.audit.index') }}" class="nav-link {{ $r === 'admin.audit.index' ? 'active' : '' }}">
+                <i class="fa-solid fa-chart-line"></i><span>Auditoria</span>
+            </a>
+            <a href="{{ route('admin.access-audit.index') }}" class="nav-link {{ $r === 'admin.access-audit.index' ? 'active' : '' }}">
+                <i class="fa-solid fa-user-shield"></i><span>Aud. de Acesso</span>
+            </a>
+
+            <div class="nav-section">AI</div>
+            <a href="{{ route('admin.ai-memory.dashboard') }}" class="nav-link {{ str_starts_with((string) $r, 'admin.ai-memory') ? 'active' : '' }}">
+                <i class="fa-solid fa-brain"></i><span>AI-MEMORY</span>
+            </a>
+
+            <div class="nav-section">Conta</div>
+            <a href="{{ route('admin.profile') }}" class="nav-link {{ $r === 'admin.profile' ? 'active' : '' }}">
+                <i class="fa-solid fa-gear"></i><span>Perfil</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-spacer"></div>
+
+        <div class="sidebar-user">
+            <div class="sidebar-user-avatar">{{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}</div>
+            <div class="sidebar-user-info">
+                <div class="sidebar-user-name">{{ auth()->user()->name ?? 'Admin' }}</div>
+                <div class="sidebar-user-email">{{ auth()->user()->email ?? '' }}</div>
+            </div>
+        </div>
+
+        <a href="{{ route('home') }}" target="_blank" class="nav-link" style="margin-top: 6px;">
+            <i class="fa-solid fa-up-right-from-square"></i><span>Ver site</span>
+        </a>
         <form method="POST" action="{{ route('logout') }}">
             @csrf
-            <button type="submit" class="nav-link" style="width:100%;background:none;border:none;text-align:left;cursor:pointer;font:inherit"><i class="fa-solid fa-arrow-right-from-bracket"></i><span>Sair</span></button>
+            <button type="submit" class="nav-link" style="width:100%;background:none;border:none;text-align:left;cursor:pointer;font:inherit;color:inherit;padding:9px 11px;">
+                <i class="fa-solid fa-right-from-bracket"></i><span>Sair</span>
+            </button>
         </form>
     </aside>
 
@@ -136,10 +310,10 @@
         </div>
         <div class="content">
             @if(session('status'))
-                <div class="admin-alert admin-alert-ok">{{ session('status') }}</div>
+                <div class="admin-alert admin-alert-ok"><i class="fa-solid fa-circle-check"></i> {{ session('status') }}</div>
             @endif
             @if(session('error'))
-                <div class="admin-alert admin-alert-error">{{ session('error') }}</div>
+                <div class="admin-alert admin-alert-error"><i class="fa-solid fa-circle-exclamation"></i> {{ session('error') }}</div>
             @endif
             @yield('content')
         </div>
