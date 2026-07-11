@@ -6,7 +6,7 @@
     <a href="{{ route('admin.projects.create') }}" class="admin-btn admin-btn-primary"><i class="fa-solid fa-plus"></i> Novo projeto</a>
 @endsection
 
-@section('content'
+@section('content')
 
     <div class="admin-stats-grid">
         <div class="admin-stat">
