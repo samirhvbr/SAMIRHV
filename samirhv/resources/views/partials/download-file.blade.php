@@ -1,8 +1,8 @@
 {{-- Uma linha de arquivo para download. Espera $file (ProjectFile). --}}
 <div class="dl-file">
-    <div style="flex:1; min-width:0;">
+    <div class="dl-file__info">
         <div class="dl-name">{{ $file->original_name ?: $file->label }}</div>
-        <div class="d-flex align-items-center flex-wrap" style="gap:8px; margin-top:7px;">
+        <div class="dl-file__meta">
             @if($file->file_type)<span class="dl-badge">{{ $file->file_type }}</span>@endif
             @if($file->arch)<span class="dl-badge dl-badge-arch">{{ $file->arch }}</span>@endif
             <span class="dl-meta">{{ $file->human_size }}</span>

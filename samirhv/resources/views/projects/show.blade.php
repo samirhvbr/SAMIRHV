@@ -24,12 +24,12 @@
 
 @section('content')
 
-    <section class="s-section" style="padding-top:clamp(7rem,11vw,10rem); position:relative;">
+    <section class="s-page-hero">
         <div class="s-aura"></div>
-        <div class="container s-prose" style="position:relative; z-index:1; max-width:820px;">
+        <div class="container s-project-shell" style="position:relative; z-index:1;">
 
             <nav style="margin-bottom:30px;">
-                <a href="{{ route('downloads') }}" class="s-meta" style="color:var(--s-accent-ink-2);"><i class="fa-solid fa-arrow-left" style="margin-right:7px;"></i>Downloads</a>
+                <a href="{{ route('downloads') }}" class="s-meta s-backlink"><i class="fa-solid fa-arrow-left"></i>Downloads</a>
             </nav>
 
             @php
@@ -42,7 +42,7 @@
                     ->map(fn ($f) => $f->arch)->filter()->unique()->values();
             @endphp
 
-            <header class="d-flex align-items-start gap-3" style="margin-bottom:22px;">
+            <header class="s-project-header">
                 @if($project->icon)
                     <span class="s-icon s-icon--lg"><i class="{{ $project->icon }}"></i></span>
                 @endif
@@ -66,24 +66,27 @@
             </header>
 
             @if($project->description)
-                <div class="s-body" style="color:var(--s-ink-2); line-height:1.8; margin-bottom:34px; white-space:pre-line;">{{ $project->description }}</div>
+                <div class="s-project-description">{{ $project->description }}</div>
             @endif
 
-            {{-- Híbrido: site externo + downloads. O botão manda pra versão online; abaixo, o app desktop. --}}
+            {{-- Híbrido: as opções ficam lado a lado quando site e app coexistem. --}}
             @if($project->external_url)
-                <div class="s-panel" style="padding:18px 20px; margin-bottom:30px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; background:linear-gradient(135deg, var(--s-accent-soft-2), transparent); border-color:var(--s-line-2);">
-                    <div style="flex:1; min-width:240px;">
-                        <div class="s-meta" style="color:var(--s-accent-ink-2); text-transform:uppercase; letter-spacing:.08em; margin-bottom:5px;">Versão online</div>
-                        <div class="s-body" style="color:var(--s-ink-2); font-size:.95rem; line-height:1.6;">Use direto no navegador, sem instalar — sempre na última versão.</div>
+                <div class="s-access-options">
+                    <div class="s-panel s-access-option">
+                        <span class="s-access-option__eyebrow">Versão online</span>
+                        <p class="s-access-option__copy">Use direto no navegador, sem instalar e sempre na última versão.</p>
+                        <a href="{{ $project->external_url }}" target="_blank" rel="noopener" class="s-btn s-btn--sm">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Usar online
+                        </a>
                     </div>
-                    <a href="{{ $project->external_url }}" target="_blank" rel="noopener" class="s-btn m-0">
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Usar online
-                    </a>
+                    @if($download['has_any'])
+                        <div class="s-panel s-access-option">
+                            <span class="s-access-option__eyebrow">Aplicativo desktop</span>
+                            <p class="s-access-option__copy">Baixe um build nativo para o seu sistema e trabalhe localmente.</p>
+                            <a href="#arquivos" class="s-btn s-btn--ghost s-btn--sm"><i class="fa-solid fa-download"></i> Ver downloads</a>
+                        </div>
+                    @endif
                 </div>
-
-                @if($download['has_any'])
-                    <div class="s-meta" style="margin-bottom:18px;">ou baixe o app para o seu sistema:</div>
-                @endif
             @endif
 
             @if(session('download_unavailable'))
@@ -98,12 +101,13 @@
 
                 {{-- ─── Recomendado para você ─── --}}
                 @php($rec = $download['recommended'])
-                <div class="s-panel" style="padding:18px; margin-bottom:34px;">
-                    <div class="d-flex align-items-center gap-2" style="margin-bottom:14px;">
-                        <span class="s-meta" style="color:var(--s-accent-ink-2); text-transform:uppercase; letter-spacing:.06em;">
-                            Recomendado para você · {{ \App\Support\OsDetector::label($rec['os']) }}@if($rec['file'] && $rec['file']->arch) ({{ $rec['file']->arch }})@endif
-                        </span>
-                        <a href="#arquivos" class="s-meta" style="margin-left:auto;">trocar de sistema ↓</a>
+                <div class="s-panel s-download-recommendation">
+                    <div class="s-download-recommendation__head">
+                        <div>
+                            <span class="s-meta" style="color:var(--s-accent-ink-2); text-transform:uppercase; letter-spacing:.06em;">Download recomendado</span>
+                            <h2 class="s-download-recommendation__title">Baixar para {{ \App\Support\OsDetector::label($rec['os']) }}@if($rec['file'] && $rec['file']->arch) · {{ $rec['file']->arch }}@endif</h2>
+                        </div>
+                        <a href="#arquivos" class="s-meta s-backlink">trocar de sistema <i class="fa-solid fa-arrow-down"></i></a>
                     </div>
 
                     @if($rec['fallback_note'])

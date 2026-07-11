@@ -53,14 +53,10 @@
                             </button>
                         </div>
 
-                        <div class="col-lg-5 d-lg-flex justify-content-end order-lg-last align-items-center gap-3">
-                            <div class="header-misc d-none d-lg-flex align-items-center gap-2">
-                                <a href="{{ route('home') }}" class="s-flink" style="font-size: 0.82rem; color: var(--s-muted); display: inline-flex; align-items: center; gap: 5px; transition: color 0.18s;" onmouseover="this.style.color='var(--s-ink-2)'" onmouseout="this.style.color='var(--s-muted)'">
-                                    <i class="fa-solid fa-house" style="font-size: 0.7rem;"></i> Início
-                                </a>
-                                <span style="width: 3px; height: 3px; border-radius: 50%; background: rgba(99,102,241,0.3);"></span>
-                                <a href="{{ route('admin.dashboard') }}" class="s-btn s-btn--ghost s-btn--sm m-0">
-                                    <span>Admin</span> <i class="bi-arrow-right d-none d-lg-inline"></i>
+                        <div class="col-lg-5 d-lg-flex justify-content-end order-lg-last align-items-center">
+                            <div class="header-misc d-none d-lg-flex">
+                                <a href="{{ route('downloads') }}" class="s-btn s-btn--sm s-header-action m-0">
+                                    <i class="fa-solid fa-download"></i> Downloads
                                 </a>
                             </div>
                         </div>

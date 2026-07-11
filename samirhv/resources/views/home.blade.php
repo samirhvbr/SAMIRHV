@@ -22,7 +22,7 @@
         <div class="container" style="position:relative; z-index:1;">
             <div class="row align-items-center g-5">
 
-                <div class="col-lg-6 s-reveal" data-d="1">
+                <div class="col-lg-6 s-reveal s-hero-copy" data-d="1">
                     <span class="s-kicker">Central de projetos</span>
                     <h1 class="s-display">Software que eu construo,<br>pronto pra você baixar.</h1>
                     <p class="s-lead" style="margin-top: 1.5rem;">
@@ -43,7 +43,7 @@
                     </p>
                 </div>
 
-                <div class="col-lg-6 s-reveal" data-d="2">
+                <div class="col-lg-6 s-reveal s-hero-proof" data-d="2">
                     <div class="s-term" role="img" aria-label="Exemplo do agente de IA do SShvTerm operando um terminal SSH: propõe um comando, pede aprovação e executa.">
                         <div class="s-term__bar">
                             <span class="s-term__dot s-term__dot--r"></span>
@@ -82,70 +82,25 @@
         </div>
     </section>
 
-    {{-- ═══ EM DESTAQUE — o agente do SShvTerm opera o terminal ═══ --}}
-    <section class="s-section s-bg-2" style="position: relative;">
-        <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 500px; height: 250px; background: radial-gradient(ellipse at center top, rgba(99,102,241,0.04) 0%, transparent 65%); pointer-events: none;"></div>
-
-        <div class="container" style="position: relative;">
-            <div class="row g-5 align-items-center">
-
-                <div class="col-lg-6 s-reveal" data-d="1">
-                    <h2 class="s-h2">A IA agora opera o<br>terminal — com política.</h2>
-                    <p class="s-lead" style="margin-top: 1.25rem;">
-                        No <strong style="color:var(--s-ink);font-weight:600;">SShvTerm</strong>, um agente de IA propõe e executa comandos
-                        no seu terminal SSH <em style="color:var(--s-ink-2);font-style:normal;">visível</em> — nada de caixa-preta. Você decide
-                        quanto de autonomia dar, subindo em degraus.
-                    </p>
-                    <ul class="s-points" style="margin-top: 2.2rem;">
-                        <li>
-                            <span class="n"><i class="fa-solid fa-terminal"></i></span>
-                            <span><strong>Digita no terminal real</strong><span class="d">O agente executa no PTY visível da aba — você vê cada comando entrar, como se tivesse digitado.</span></span>
-                        </li>
-                        <li>
-                            <span class="n"><i class="fa-solid fa-shield-halved"></i></span>
-                            <span><strong>Política allow · ask · deny</strong><span class="d">Comando confiável roda, perigoso é bloqueado, o resto pergunta. A escada L0→L3 é o próprio modelo de segurança.</span></span>
-                        </li>
-                        <li>
-                            <span class="n"><i class="fa-solid fa-key"></i></span>
-                            <span><strong>BYO-key, no seu cliente</strong><span class="d">Sua chave de API fica no cliente. Zero-knowledge preservado: o servidor nunca vê a saída dos seus hosts.</span></span>
-                        </li>
-                    </ul>
-                    <div class="d-flex gap-3 flex-wrap" style="margin-top: 2.2rem;">
-                        <a href="https://sshvterm.com" target="_blank" rel="noopener" class="s-btn">
-                            Conhecer o SShvTerm <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="col-lg-6 s-reveal" data-d="2">
-                    <div class="s-panel s-card--pad" style="padding: clamp(1.4rem, 2.4vw, 1.9rem);">
-                        <div class="d-flex align-items-center gap-2" style="margin-bottom: 1.15rem;">
-                            <i class="fa-solid fa-sliders" style="color: var(--s-accent-ink-2); font-size: 0.95rem;"></i>
-                            <span class="s-meta" style="color: var(--s-ink-2);">settings.json — política de comandos</span>
-                        </div>
-                        <div class="s-stack" style="gap: 11px; font-family: var(--s-mono); font-size: 0.82rem; line-height: 1.55;">
-                            <div style="display:flex; gap:13px; align-items:baseline;">
-                                <span style="color: var(--s-ok); font-weight: 600; width: 54px; flex-shrink: 0;">allow</span>
-                                <span style="color: var(--s-ink-2);">ls, cat, git status, systemctl status</span>
-                            </div>
-                            <div class="s-divider"></div>
-                            <div style="display:flex; gap:13px; align-items:baseline;">
-                                <span style="color: var(--s-warn); font-weight: 600; width: 54px; flex-shrink: 0;">ask</span>
-                                <span style="color: var(--s-ink-2);">sudo *, systemctl restart *, docker *</span>
-                            </div>
-                            <div class="s-divider"></div>
-                            <div style="display:flex; gap:13px; align-items:baseline;">
-                                <span style="color: var(--s-danger); font-weight: 600; width: 54px; flex-shrink: 0;">deny</span>
-                                <span style="color: var(--s-ink-2);">rm -rf /*, mkfs*, dd of=/dev/*</span>
-                            </div>
-                        </div>
-                        <p class="s-meta" style="margin: 1.3rem 0 0; line-height: 1.65;">
-                            <i class="fa-solid fa-lock" style="color: var(--s-accent-ink-2); margin-right: 6px;"></i>
-                            A fronteira instrução-vs-dado trata a saída do terminal como <span style="color: var(--s-ink-2);">dado</span>, nunca como comando.
-                        </p>
-                    </div>
-                </div>
-
+    {{-- ═══ COMO OS PROJETOS SÃO FEITOS ═══ --}}
+    <section class="s-principles s-bg-2">
+        <div class="container">
+            <div class="s-principles-grid">
+                <article class="s-principle">
+                    <span class="s-principle__icon"><i class="fa-solid fa-terminal"></i></span>
+                    <h3>Feito para uso real</h3>
+                    <p>Ferramentas para terminal, desktop e infraestrutura, pensadas para entrar no fluxo de trabalho.</p>
+                </article>
+                <article class="s-principle">
+                    <span class="s-principle__icon"><i class="fa-solid fa-shield-halved"></i></span>
+                    <h3>Controle continua seu</h3>
+                    <p>Automação onde ajuda, transparência onde importa e políticas explícitas para ações sensíveis.</p>
+                </article>
+                <article class="s-principle">
+                    <span class="s-principle__icon"><i class="fa-brands fa-github"></i></span>
+                    <h3>Aberto por padrão</h3>
+                    <p>Releases versionadas, downloads diretos e projetos que acompanham o desenvolvimento de perto.</p>
+                </article>
             </div>
         </div>
     </section>
@@ -156,7 +111,7 @@
 
         <div class="container" style="position: relative;">
 
-            <div style="max-width: 640px; margin-bottom: clamp(2.2rem, 4vw, 3.2rem);" class="s-reveal" data-d="1">
+            <div class="s-section-head s-reveal" data-d="1">
                 <h2 class="s-h2">Projetos</h2>
                 <p class="s-lead s-muted" style="margin-top: 0.75rem;">Disponíveis para baixar e usar — sempre na versão mais recente.</p>
             </div>
@@ -169,9 +124,10 @@
                     $fLink = $featured->redirectsToSite(); $fDocs = $featured->hasCustomPage();
                     $fAction = $fLink ? 'Visitar site' : ($fDocs ? 'Abrir' : 'Ver downloads');
                 @endphp
-                <a href="{{ $featured->public_url }}" @if($fLink) target="_blank" rel="noopener" @endif class="s-card s-card--hover s-card--pad s-featured s-reveal" data-d="2" style="margin-bottom: 20px; text-decoration: none;">
+                <a href="{{ $featured->public_url }}" @if($fLink) target="_blank" rel="noopener" @endif class="s-card s-card--hover s-featured s-reveal" data-d="2" style="margin-bottom: 20px; text-decoration: none;">
                     <span class="s-icon s-icon--lg"><i class="{{ $featured->icon ?: 'fa-solid fa-box-open' }}"></i></span>
                     <div style="min-width: 0;">
+                        <span class="s-featured__label">Em destaque</span>
                         <div class="d-flex align-items-center gap-2 flex-wrap" style="margin-bottom: 9px;">
                             <h3 class="s-h3" style="font-size: 1.38rem;">{{ $featured->title }}</h3>
                             @if($featured->category)<span class="s-tag s-tag--accent">{{ $featured->category }}</span>@endif
@@ -193,16 +149,16 @@
                             elseif ($isDocs)  { $mIcon='fa-book'; $mText='documentação'; }
                             else              { $mIcon='fa-download'; $mText=number_format($project->downloads_total ?? 0,0,',','.').' downloads'; }
                         @endphp
-                        <a href="{{ $project->public_url }}" @if($isLink) target="_blank" rel="noopener" @endif class="s-card s-card--hover s-card--pad s-stack" style="text-decoration: none;">
+                        <a href="{{ $project->public_url }}" @if($isLink) target="_blank" rel="noopener" @endif class="s-card s-card--hover s-project-card s-stack" style="text-decoration: none;">
                             <div class="d-flex align-items-center gap-2" style="margin-bottom: 14px;">
                                 <span class="s-icon"><i class="{{ $project->icon ?: 'fa-solid fa-box-open' }}"></i></span>
                                 @if($project->category)<span class="s-tag">{{ $project->category }}</span>@endif
                             </div>
                             <h3 class="s-h3" style="font-size: 1.12rem; margin-bottom: 8px;">{{ $project->title }}</h3>
                             <p class="s-body s-muted" style="font-size: 0.88rem; margin: 0; flex-grow: 1;">{{ Str::limit($project->description, 100) }}</p>
-                            <div class="d-flex align-items-center justify-content-between" style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--s-line);">
+                            <div class="s-project-card__footer">
                                 <span class="s-meta"><i class="fa-solid {{ $mIcon }}" style="margin-right: 5px;"></i>{{ $mText }}</span>
-                                <span class="s-meta s-accent-ink">abrir <i class="fa-solid fa-arrow-right" style="font-size: 0.7rem; transition: transform 0.2s;"></i></span>
+                                <span class="s-meta s-accent-ink">abrir <i class="fa-solid fa-arrow-right s-project-card__arrow" style="font-size: 0.7rem;"></i></span>
                             </div>
                         </a>
                     @endforeach

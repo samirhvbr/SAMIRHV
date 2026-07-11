@@ -5,16 +5,21 @@
 
 @section('content')
 
-    <section class="s-section" style="padding-top:clamp(7rem,11vw,10rem); position:relative;">
+    <section class="s-page-hero">
         <div class="s-aura"></div>
-        <div class="container" style="position:relative; z-index:1;">
+        <div class="container">
 
-            <div style="max-width:640px; margin-bottom:clamp(2.4rem,5vw,3.6rem);">
+            <div class="s-page-hero__content">
                 <span class="s-kicker">Downloads</span>
                 <h1 class="s-display" style="font-size:clamp(2.2rem,5vw,3.4rem);">Projetos para baixar</h1>
                 <p class="s-lead" style="margin-top:1rem;">
-                    {{ $totalFiles }} arquivo{{ $totalFiles === 1 ? '' : 's' }} em {{ $projects->count() }} projeto{{ $projects->count() === 1 ? '' : 's' }}. Sempre a versão mais recente.
+                    Releases diretos para as ferramentas que estou construindo. Escolha um projeto, confira a versão e baixe.
                 </p>
+                <div class="s-page-hero__meta">
+                    <span>{{ $projects->count() }} projeto{{ $projects->count() === 1 ? '' : 's' }}</span>
+                    <span>{{ $totalFiles === 1 ? '1 arquivo disponível' : $totalFiles.' arquivos disponíveis' }}</span>
+                    <span>releases versionados</span>
+                </div>
             </div>
 
             @if(session('download_unavailable'))
@@ -23,7 +28,7 @@
                 </div>
             @endif
 
-            <div class="s-stack" style="max-width:880px; gap:16px;">
+            <div class="s-project-list">
                 @forelse($projects as $project)
                     @php
                         $files = $project->availableFiles;
@@ -34,13 +39,13 @@
                         $arches = $files->map(fn ($f) => $f->arch)->filter()->unique()->values();
                         $dlTotal = $files->sum('downloads_count');
                     @endphp
-                    <article class="s-card s-card--pad" style="padding:24px 28px;">
-                        <div class="d-flex align-items-start gap-3 flex-wrap">
+                    <article class="s-card s-download-card">
+                        <div class="s-download-card__top">
                             @if($project->icon)
                                 <span class="s-icon"><i class="{{ $project->icon }}"></i></span>
                             @endif
-                            <div style="flex:1; min-width:220px;">
-                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <div class="s-download-card__body">
+                                <div class="s-download-card__title-row">
                                     <h2 class="s-h3" style="font-size:1.25rem;">
                                         <a href="{{ route('project.show', $project) }}" style="color:inherit;">{{ $project->title }}</a>
                                     </h2>
@@ -51,27 +56,28 @@
                                 </div>
 
                                 @if($project->description)
-                                    <p class="s-body s-muted" style="font-size:0.92rem; margin:8px 0 0; max-width:60ch;">{{ Str::limit($project->description, 160) }}</p>
-                                @endif
-
-                                @if($files->isNotEmpty())
-                                    <div class="s-meta d-flex align-items-center flex-wrap" style="gap:8px 14px; margin-top:13px;">
-                                        @foreach($oses as $os)
-                                            <span class="d-inline-flex align-items-center" style="gap:5px;"><span aria-hidden="true" style="width:6px;height:6px;border-radius:50%;background:var(--s-accent);display:inline-block;"></span>{{ \App\Support\OsDetector::label($os) }}</span>
-                                        @endforeach
-                                        @if($latest && $latest->version)<span>· v{{ $latest->version }}</span>@endif
-                                        @if($latest && $latest->effective_date)<span>· {{ $latest->effective_date->translatedFormat('d M Y') }}</span>@endif
-                                        @if($arches->isNotEmpty())<span>· {{ $arches->implode('·') }}</span>@endif
-                                        <span>· {{ $files->count() }} arquivo{{ $files->count() === 1 ? '' : 's' }}</span>
-                                        @if($dlTotal > 0)<span>· {{ number_format($dlTotal, 0, ',', '.') }} downloads</span>@endif
-                                    </div>
-                                @else
-                                    <div class="s-meta" style="margin-top:13px;">Arquivos em breve.</div>
+                                    <p class="s-download-card__description">{{ Str::limit($project->description, 160) }}</p>
                                 @endif
                             </div>
+                        </div>
 
-                            <a href="{{ route('project.show', $project) }}" class="s-btn s-btn--sm m-0" style="align-self:center; flex-shrink:0;">
-                                <i class="fa-solid fa-download"></i> Baixar
+                        <div class="s-download-card__footer">
+                            @if($files->isNotEmpty())
+                                <div class="s-release-meta">
+                                    @foreach($oses as $os)
+                                        <span class="s-release-meta__os">{{ \App\Support\OsDetector::label($os) }}</span>
+                                    @endforeach
+                                    @if($latest && $latest->version)<span class="s-release-meta__primary">v{{ $latest->version }}</span>@endif
+                                    @if($latest && $latest->effective_date)<span>{{ $latest->effective_date->translatedFormat('d M Y') }}</span>@endif
+                                    @if($arches->isNotEmpty())<span>{{ $arches->implode(' · ') }}</span>@endif
+                                    @if($dlTotal > 0)<span>{{ number_format($dlTotal, 0, ',', '.') }} downloads</span>@endif
+                                </div>
+                            @else
+                                <span class="s-meta">Arquivos em breve.</span>
+                            @endif
+
+                            <a href="{{ route('project.show', $project) }}" class="s-btn s-btn--sm m-0">
+                                <i class="fa-solid fa-download"></i> Ver arquivos
                             </a>
                         </div>
                     </article>
