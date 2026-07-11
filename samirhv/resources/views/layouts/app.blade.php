@@ -39,9 +39,9 @@
         <header id="header" class="transparent-header dark">
             <div id="header-wrap">
                 <div class="container">
-                    <div class="header-row justify-content-lg-between">
+                    <div class="header-row s-site-header">
 
-                        <div id="logo" class="col-lg-2 order-lg-2 mx-lg-auto justify-content-lg-center">
+                        <div id="logo">
                             <a href="{{ route('home') }}" aria-label="Samirhv — início">
                                 <span class="s-logo">samirhv<b>.</b></span>
                             </a>
@@ -53,15 +53,7 @@
                             </button>
                         </div>
 
-                        <div class="col-lg-5 d-lg-flex justify-content-end order-lg-last align-items-center">
-                            <div class="header-misc d-none d-lg-flex">
-                                <a href="{{ route('downloads') }}" class="s-btn s-btn--sm s-header-action m-0">
-                                    <i class="fa-solid fa-download"></i> Downloads
-                                </a>
-                            </div>
-                        </div>
-
-                        <nav class="primary-menu col-lg-5 order-lg-1 on-click" aria-label="Navegação principal">
+                        <nav class="primary-menu on-click" aria-label="Navegação principal">
                             <ul class="menu-container">
                                 <li class="menu-item"><a class="menu-link" href="{{ route('home') }}"><div>Início</div></a></li>
                                 @php $navProjects = $navProjects ?? collect(); @endphp
@@ -92,6 +84,12 @@
                                 <li class="menu-item"><a class="menu-link" href="{{ route('downloads') }}"><div>Downloads</div></a></li>
                             </ul>
                         </nav>
+
+                        <div class="header-misc d-none d-lg-flex">
+                            <a href="{{ route('downloads') }}" class="s-btn s-btn--sm s-header-action m-0">
+                                Explorar releases <i class="fa-solid fa-arrow-right"></i>
+                            </a>
+                        </div>
 
                     </div>
                 </div>

@@ -5,177 +5,176 @@
 
 @section('content')
 
+    @php
+        $featuredProject = $featured ?? $projects->first();
+        $otherProjects = $featuredProject
+            ? $projects->reject(fn ($project) => $project->id === $featuredProject->id)->values()
+            : collect();
+    @endphp
+
     {{-- ═══ HERO ═══ --}}
-    <section class="s-hero">
+    <section class="s-home-hero">
         <div class="s-aura"></div>
-        <svg class="s-hero__dots" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" aria-hidden="true">
-            <defs>
-                <pattern id="s-dots" x="0" y="0" width="26" height="26" patternUnits="userSpaceOnUse">
-                    <circle cx="1.5" cy="1.5" r="1.3" fill="#6366f1"/>
-                </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#s-dots)"/>
-        </svg>
-        <!-- Glow secundário (canto inferior esquerdo) -->
-        <div style="position: absolute; bottom: -15%; left: -8%; width: 420px; height: 420px; background: radial-gradient(circle, rgba(99,102,241,0.05) 0%, transparent 62%); pointer-events: none; z-index: 0;"></div>
-
-        <div class="container" style="position:relative; z-index:1;">
-            <div class="row align-items-center g-5">
-
-                <div class="col-lg-6 s-reveal s-hero-copy" data-d="1">
-                    <span class="s-kicker">Central de projetos</span>
-                    <h1 class="s-display">Software que eu construo,<br>pronto pra você baixar.</h1>
-                    <p class="s-lead" style="margin-top: 1.5rem;">
-                        Um espaço pessoal de Samir Hanna Verza para organizar e disponibilizar o que desenvolvo —
-                        apps desktop, ferramentas de linha de comando e produtos como o <strong style="color:var(--s-ink);font-weight:600;">ShvIA</strong> e o
-                        <strong style="color:var(--s-ink);font-weight:600;">SShvTerm</strong>. Sempre na versão mais recente.
-                    </p>
-                    <div class="d-flex gap-3 flex-wrap" style="margin-top: 2.2rem;">
-                        <a href="{{ route('downloads') }}" class="s-btn s-btn--lg">
-                            <i class="fa-solid fa-download"></i> Ver downloads
-                        </a>
-                        <a href="https://github.com/samirhvbr" target="_blank" rel="noopener" class="s-btn s-btn--ghost s-btn--lg">
-                            <i class="fa-brands fa-github"></i> GitHub
-                        </a>
-                    </div>
-                    <p class="s-hero__trust" style="margin-top: 1.8rem;">
-                        <span class="dot"></span> samirhv.com.br · Laravel · Debian · open-source
-                    </p>
-                </div>
-
-                <div class="col-lg-6 s-reveal s-hero-proof" data-d="2">
-                    <div class="s-term" role="img" aria-label="Exemplo do agente de IA do SShvTerm operando um terminal SSH: propõe um comando, pede aprovação e executa.">
-                        <div class="s-term__bar">
-                            <span class="s-term__dot s-term__dot--r"></span>
-                            <span class="s-term__dot s-term__dot--y"></span>
-                            <span class="s-term__dot s-term__dot--g"></span>
-                            <span class="s-term__title">deploy@prod-01 — SShvTerm</span>
-                        </div>
-                        <div class="s-term__body">
-                            <div><span class="c-key">agente ▸</span> preciso liberar espaço em /var — o que está pesado ali?</div>
-                            <div><span class="c-cmt"># o agente propõe; você mantém o controle</span></div>
-                            <div><span class="c-prompt">$</span> du -sh /var/* | sort -h | tail -2</div>
-                            <div><span class="c-dim">1.2G</span>&nbsp;&nbsp;/var/log</div>
-                            <div><span class="c-dim">3.4G</span>&nbsp;&nbsp;/var/lib/docker</div>
-                            <div><span class="c-key">ask ▸</span> sudo journalctl --vacuum-size=200M &nbsp;<span class="c-cmt">[permitir]</span></div>
-                            <div><span class="c-prompt">$</span> sudo journalctl --vacuum-size=200M</div>
-                            <div><span class="c-ok">&#10003;</span> 980M liberados · /var/log agora em 220M</div>
-                        </div>
-                        <div class="s-term__foot">
-                            <i class="fa-solid fa-bolt"></i> política <span style="color:var(--s-ok)">allow</span> · <span style="color:var(--s-warn)">ask</span> · <span style="color:var(--s-danger)">deny</span> — no seu terminal visível
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="s-techrow s-reveal" data-d="3" style="margin-top: clamp(2.5rem, 5vw, 4rem); padding-top: 1.5rem; border-top: 1px solid var(--s-line);">
-                <span><i class="fa-brands fa-linux"></i> Linux</span>
-                <span><i class="fa-solid fa-server"></i> Debian</span>
-                <span><i class="fa-brands fa-laravel"></i> Laravel</span>
-                <span><i class="fa-brands fa-php"></i> PHP</span>
-                <span><i class="fa-brands fa-rust"></i> Rust</span>
-                <span><i class="fa-brands fa-docker"></i> Docker</span>
-                <span><i class="fa-brands fa-git-alt"></i> Git</span>
-                <span><i class="fa-solid fa-database"></i> MariaDB</span>
-            </div>
-        </div>
-    </section>
-
-    {{-- ═══ COMO OS PROJETOS SÃO FEITOS ═══ --}}
-    <section class="s-principles s-bg-2">
         <div class="container">
-            <div class="s-principles-grid">
-                <article class="s-principle">
-                    <span class="s-principle__icon"><i class="fa-solid fa-terminal"></i></span>
-                    <h3>Feito para uso real</h3>
-                    <p>Ferramentas para terminal, desktop e infraestrutura, pensadas para entrar no fluxo de trabalho.</p>
-                </article>
-                <article class="s-principle">
-                    <span class="s-principle__icon"><i class="fa-solid fa-shield-halved"></i></span>
-                    <h3>Controle continua seu</h3>
-                    <p>Automação onde ajuda, transparência onde importa e políticas explícitas para ações sensíveis.</p>
-                </article>
-                <article class="s-principle">
-                    <span class="s-principle__icon"><i class="fa-brands fa-github"></i></span>
-                    <h3>Aberto por padrão</h3>
-                    <p>Releases versionadas, downloads diretos e projetos que acompanham o desenvolvimento de perto.</p>
-                </article>
+            <div class="s-home-hero__grid">
+                <div class="s-home-hero__copy s-reveal" data-d="1">
+                    <span class="s-kicker">Engenharia independente</span>
+                    <h1 class="s-home-title">Ferramentas que nascem do trabalho real.</h1>
+                    <p class="s-lead s-home-intro">
+                        Apps, utilitários e software de infraestrutura construídos por Samir Hanna Verza.
+                        Projetos diretos, releases verificáveis e downloads sem atrito.
+                    </p>
+
+                    <div class="s-home-actions">
+                        <a href="#projetos" class="s-btn s-btn--lg">
+                            Explorar projetos <i class="fa-solid fa-arrow-down"></i>
+                        </a>
+                        <a href="https://github.com/samirhvbr" target="_blank" rel="noopener" class="s-text-link">
+                            <i class="fa-brands fa-github"></i> Ver código no GitHub
+                        </a>
+                    </div>
+
+                    <div class="s-home-trust">
+                        <span><i class="fa-solid fa-circle-check"></i> releases versionados</span>
+                        <span><i class="fa-solid fa-shield-halved"></i> hashes publicados</span>
+                        <span><i class="fa-brands fa-linux"></i> foco em Linux</span>
+                    </div>
+                </div>
+
+                <div class="s-release-board s-reveal" data-d="2" aria-label="Catálogo de projetos publicados">
+                    <div class="s-release-board__bar">
+                        <div>
+                            <span class="s-release-board__eyebrow">Catálogo público</span>
+                            <strong>Projetos em produção</strong>
+                        </div>
+                        <span class="s-live-status"><i></i> online</span>
+                    </div>
+
+                    @if($featuredProject)
+                        <a href="{{ $featuredProject->public_url }}" @if($featuredProject->redirectsToSite()) target="_blank" rel="noopener" @endif class="s-release-board__featured">
+                            <span class="s-release-board__icon"><i class="{{ $featuredProject->icon ?: 'fa-solid fa-cube' }}"></i></span>
+                            <span class="s-release-board__featured-copy">
+                                <small>Projeto em destaque</small>
+                                <strong>{{ $featuredProject->title }}</strong>
+                                <span>{{ Str::limit($featuredProject->description, 105) }}</span>
+                            </span>
+                            <i class="fa-solid fa-arrow-up-right-from-square s-release-board__arrow"></i>
+                        </a>
+                    @endif
+
+                    <div class="s-release-board__list">
+                        @foreach($projects->take(4) as $project)
+                            <a href="{{ $project->public_url }}" @if($project->redirectsToSite()) target="_blank" rel="noopener" @endif class="s-release-row">
+                                <span class="s-release-row__index">0{{ $loop->iteration }}</span>
+                                <span class="s-release-row__name">{{ $project->title }}</span>
+                                <span class="s-release-row__type">{{ $project->category ?: ($project->redirectsToSite() ? 'site' : 'software') }}</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </a>
+                        @endforeach
+                    </div>
+
+                    <div class="s-release-board__foot">
+                        <span>{{ $projects->count() }} projetos publicados</span>
+                        <a href="{{ route('downloads') }}">abrir central de downloads <i class="fa-solid fa-arrow-right"></i></a>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
     {{-- ═══ PROJETOS ═══ --}}
-    <section class="s-section" id="projetos" style="position: relative;">
-        <div style="position: absolute; top: 60px; right: -10%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(99,102,241,0.04) 0%, transparent 62%); pointer-events: none;"></div>
-
-        <div class="container" style="position: relative;">
-
-            <div class="s-section-head s-reveal" data-d="1">
-                <h2 class="s-h2">Projetos</h2>
-                <p class="s-lead s-muted" style="margin-top: 0.75rem;">Disponíveis para baixar e usar — sempre na versão mais recente.</p>
+    <section class="s-projects-section" id="projetos">
+        <div class="container">
+            <div class="s-heading-row">
+                <div>
+                    <span class="s-section-number">01 / PROJETOS</span>
+                    <h2 class="s-h2">Trabalho publicado</h2>
+                    <p class="s-lead s-muted">Software com propósito claro, pronto para usar ou acompanhar.</p>
+                </div>
+                <a href="{{ route('downloads') }}" class="s-text-link d-none d-md-inline-flex">
+                    Ver todos os downloads <i class="fa-solid fa-arrow-right"></i>
+                </a>
             </div>
 
-            @if($projects->isNotEmpty())
-                @php $featured = $projects->first(); $rest = $projects->slice(1); @endphp
-
-                {{-- Destaque: primeiro projeto, em linha horizontal --}}
-                @php
-                    $fLink = $featured->redirectsToSite(); $fDocs = $featured->hasCustomPage();
-                    $fAction = $fLink ? 'Visitar site' : ($fDocs ? 'Abrir' : 'Ver downloads');
-                @endphp
-                <a href="{{ $featured->public_url }}" @if($fLink) target="_blank" rel="noopener" @endif class="s-card s-card--hover s-featured s-reveal" data-d="2" style="margin-bottom: 20px; text-decoration: none;">
-                    <span class="s-icon s-icon--lg"><i class="{{ $featured->icon ?: 'fa-solid fa-box-open' }}"></i></span>
-                    <div style="min-width: 0;">
-                        <span class="s-featured__label">Em destaque</span>
-                        <div class="d-flex align-items-center gap-2 flex-wrap" style="margin-bottom: 9px;">
-                            <h3 class="s-h3" style="font-size: 1.38rem;">{{ $featured->title }}</h3>
-                            @if($featured->category)<span class="s-tag s-tag--accent">{{ $featured->category }}</span>@endif
+            @if($featuredProject)
+                <div class="s-portfolio-layout">
+                    <a href="{{ $featuredProject->public_url }}" @if($featuredProject->redirectsToSite()) target="_blank" rel="noopener" @endif class="s-portfolio-featured">
+                        <div class="s-portfolio-featured__top">
+                            <span class="s-project-mark"><i class="{{ $featuredProject->icon ?: 'fa-solid fa-cube' }}"></i></span>
+                            <span class="s-project-state"><i></i> disponível</span>
                         </div>
-                        <p class="s-body s-muted" style="margin: 0; font-size: 0.95rem; max-width: 60ch;">{{ Str::limit($featured->description, 165) }}</p>
-                    </div>
-                    <span class="s-btn s-btn--ghost s-btn--sm" style="pointer-events:none; align-self:center;">
-                        {{ $fAction }} <i class="fa-solid {{ $fLink ? 'fa-arrow-up-right-from-square' : 'fa-arrow-right' }}"></i>
-                    </span>
-                </a>
-
-                {{-- Restante em grade --}}
-                @if($rest->isNotEmpty())
-                <div class="s-grid s-reveal" data-d="3">
-                    @foreach($rest as $project)
-                        @php
-                            $isLink = $project->redirectsToSite(); $isDocs = $project->hasCustomPage();
-                            if ($isLink)      { $mIcon='fa-arrow-up-right-from-square'; $mText='site externo'; }
-                            elseif ($isDocs)  { $mIcon='fa-book'; $mText='documentação'; }
-                            else              { $mIcon='fa-download'; $mText=number_format($project->downloads_total ?? 0,0,',','.').' downloads'; }
-                        @endphp
-                        <a href="{{ $project->public_url }}" @if($isLink) target="_blank" rel="noopener" @endif class="s-card s-card--hover s-project-card s-stack" style="text-decoration: none;">
-                            <div class="d-flex align-items-center gap-2" style="margin-bottom: 14px;">
-                                <span class="s-icon"><i class="{{ $project->icon ?: 'fa-solid fa-box-open' }}"></i></span>
-                                @if($project->category)<span class="s-tag">{{ $project->category }}</span>@endif
+                        <div class="s-portfolio-featured__content">
+                            <span class="s-project-overline">Projeto principal</span>
+                            <h3>{{ $featuredProject->title }}</h3>
+                            <p>{{ Str::limit($featuredProject->description, 220) }}</p>
+                        </div>
+                        <div class="s-portfolio-featured__foot">
+                            <div>
+                                @if($featuredProject->category)<span>{{ $featuredProject->category }}</span>@endif
+                                @if(($featuredProject->files_count ?? 0) > 0)<span>{{ $featuredProject->files_count }} builds</span>@endif
+                                @if(($featuredProject->downloads_total ?? 0) > 0)<span>{{ number_format($featuredProject->downloads_total, 0, ',', '.') }} downloads</span>@endif
                             </div>
-                            <h3 class="s-h3" style="font-size: 1.12rem; margin-bottom: 8px;">{{ $project->title }}</h3>
-                            <p class="s-body s-muted" style="font-size: 0.88rem; margin: 0; flex-grow: 1;">{{ Str::limit($project->description, 100) }}</p>
-                            <div class="s-project-card__footer">
-                                <span class="s-meta"><i class="fa-solid {{ $mIcon }}" style="margin-right: 5px;"></i>{{ $mText }}</span>
-                                <span class="s-meta s-accent-ink">abrir <i class="fa-solid fa-arrow-right s-project-card__arrow" style="font-size: 0.7rem;"></i></span>
-                            </div>
-                        </a>
-                    @endforeach
-                </div>
-                @endif
-
-                <div style="margin-top: clamp(2.2rem, 4vw, 3rem); text-align: center;" class="s-reveal" data-d="4">
-                    <a href="{{ route('downloads') }}" class="s-btn s-btn--ghost">
-                        Ver todos os downloads <i class="fa-solid fa-arrow-right"></i>
+                            <strong>{{ $featuredProject->redirectsToSite() ? 'Visitar projeto' : 'Ver projeto' }} <i class="fa-solid fa-arrow-right"></i></strong>
+                        </div>
                     </a>
+
+                    <div class="s-portfolio-list">
+                        @foreach($otherProjects as $project)
+                            @php
+                                $isLink = $project->redirectsToSite();
+                                $meta = $isLink
+                                    ? 'site externo'
+                                    : (($project->downloads_total ?? 0) > 0
+                                        ? number_format($project->downloads_total, 0, ',', '.').' downloads'
+                                        : ($project->hasCustomPage() ? 'documentação' : 'projeto'));
+                            @endphp
+                            <a href="{{ $project->public_url }}" @if($isLink) target="_blank" rel="noopener" @endif class="s-portfolio-item">
+                                <span class="s-portfolio-item__icon"><i class="{{ $project->icon ?: 'fa-solid fa-cube' }}"></i></span>
+                                <span class="s-portfolio-item__copy">
+                                    <small>{{ $project->category ?: 'Software' }}</small>
+                                    <strong>{{ $project->title }}</strong>
+                                    <span>{{ Str::limit($project->description, 90) }}</span>
+                                </span>
+                                <span class="s-portfolio-item__meta">{{ $meta }}</span>
+                                <i class="fa-solid {{ $isLink ? 'fa-arrow-up-right-from-square' : 'fa-arrow-right' }}"></i>
+                            </a>
+                        @endforeach
+                    </div>
                 </div>
             @else
-                <div class="s-card s-card--pad s-reveal" data-d="2" style="text-align: center; padding: 70px 0;">
-                    <span class="s-meta" style="font-size: 0.85rem;">Nenhum projeto publicado ainda — em breve.</span>
-                </div>
+                <div class="s-empty-state">Nenhum projeto publicado ainda.</div>
             @endif
 
+            <a href="{{ route('downloads') }}" class="s-btn s-btn--ghost d-md-none" style="width:100%; margin-top:24px;">
+                Ver todos os downloads <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+    </section>
+
+    {{-- ═══ MÉTODO ═══ --}}
+    <section class="s-method-section">
+        <div class="container">
+            <div class="s-method-intro">
+                <span class="s-section-number">02 / PRINCÍPIOS</span>
+                <h2 class="s-h2">Software calmo.<br>Engenharia explícita.</h2>
+            </div>
+            <div class="s-method-grid">
+                <article>
+                    <span>01</span>
+                    <h3>Problema antes da interface</h3>
+                    <p>Cada projeto começa em uma necessidade real de desenvolvimento, operação ou infraestrutura.</p>
+                </article>
+                <article>
+                    <span>02</span>
+                    <h3>Procedência visível</h3>
+                    <p>Versão, sistema, arquitetura, data e hash aparecem onde a decisão de instalar acontece.</p>
+                </article>
+                <article>
+                    <span>03</span>
+                    <h3>Sem atrito artificial</h3>
+                    <p>Você entende o projeto, encontra o build correto e baixa sem cadastro ou etapas desnecessárias.</p>
+                </article>
+            </div>
         </div>
     </section>
 

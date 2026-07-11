@@ -42,52 +42,71 @@
                     ->map(fn ($f) => $f->arch)->filter()->unique()->values();
             @endphp
 
-            <header class="s-project-header">
-                @if($project->icon)
-                    <span class="s-icon s-icon--lg"><i class="{{ $project->icon }}"></i></span>
-                @endif
-                <div style="min-width:0;">
-                    @if($project->category)
-                        <span class="s-tag s-tag--accent" style="margin-bottom:10px;">{{ $project->category }}</span>
-                    @endif
-                    <h1 class="s-display" style="font-size:clamp(1.9rem,4vw,2.7rem); margin-top:8px;">{{ $project->title }}</h1>
+            <div class="s-project-overview">
+                <div class="s-project-overview__main">
+                    <header class="s-project-header">
+                        @if($project->icon)
+                            <span class="s-icon s-icon--lg"><i class="{{ $project->icon }}"></i></span>
+                        @endif
+                        <div style="min-width:0;">
+                            @if($project->category)
+                                <span class="s-tag s-tag--accent">{{ $project->category }}</span>
+                            @endif
+                            <h1 class="s-display">{{ $project->title }}</h1>
 
-                    @if($download['has_any'])
-                        <div class="s-meta d-flex align-items-center flex-wrap" style="gap:8px 12px; margin-top:12px;">
-                            @foreach($available as $os)
-                                <span class="d-inline-flex align-items-center" style="gap:5px;"><span aria-hidden="true" style="width:6px;height:6px;border-radius:50%;background:var(--s-accent);display:inline-block;"></span>{{ \App\Support\OsDetector::label($os) }}</span>
-                            @endforeach
-                            @if($latestGroup && $latestGroup['version'])<span>· v{{ $latestGroup['version'] }}</span>@endif
-                            @if($latestGroup && $latestGroup['date'])<span>· {{ $latestGroup['date']->translatedFormat('d M Y') }}</span>@endif
-                            @if($allArches->isNotEmpty())<span>· {{ $allArches->implode('·') }}</span>@endif
+                            @if($download['has_any'])
+                                <div class="s-meta s-project-release-meta">
+                                    @foreach($available as $os)
+                                        <span><i></i>{{ \App\Support\OsDetector::label($os) }}</span>
+                                    @endforeach
+                                    @if($latestGroup && $latestGroup['version'])<span>v{{ $latestGroup['version'] }}</span>@endif
+                                    @if($latestGroup && $latestGroup['date'])<span>{{ $latestGroup['date']->translatedFormat('d M Y') }}</span>@endif
+                                    @if($allArches->isNotEmpty())<span>{{ $allArches->implode(' · ') }}</span>@endif
+                                </div>
+                            @endif
                         </div>
+                    </header>
+
+                    @if($project->description)
+                        <div class="s-project-description">{{ $project->description }}</div>
                     @endif
                 </div>
-            </header>
 
-            @if($project->description)
-                <div class="s-project-description">{{ $project->description }}</div>
-            @endif
+                <aside class="s-panel s-project-action-panel" aria-label="Opções de acesso">
+                    <span class="s-project-action-panel__label">Acesso</span>
 
-            {{-- Híbrido: as opções ficam lado a lado quando site e app coexistem. --}}
-            @if($project->external_url)
-                <div class="s-access-options">
-                    <div class="s-panel s-access-option">
-                        <span class="s-access-option__eyebrow">Versão online</span>
-                        <p class="s-access-option__copy">Use direto no navegador, sem instalar e sempre na última versão.</p>
-                        <a href="{{ $project->external_url }}" target="_blank" rel="noopener" class="s-btn s-btn--sm">
-                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Usar online
-                        </a>
-                    </div>
-                    @if($download['has_any'])
-                        <div class="s-panel s-access-option">
-                            <span class="s-access-option__eyebrow">Aplicativo desktop</span>
-                            <p class="s-access-option__copy">Baixe um build nativo para o seu sistema e trabalhe localmente.</p>
-                            <a href="#arquivos" class="s-btn s-btn--ghost s-btn--sm"><i class="fa-solid fa-download"></i> Ver downloads</a>
+                    @if($project->external_url)
+                        <div class="s-project-action-panel__option">
+                            <span class="s-project-action-panel__icon"><i class="fa-solid fa-globe"></i></span>
+                            <div>
+                                <h2>Versão online</h2>
+                                <p>Abra no navegador, sem instalar e sempre na versão mais recente.</p>
+                            </div>
+                            <a href="{{ $project->external_url }}" target="_blank" rel="noopener" class="s-btn">
+                                Abrir aplicação <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </a>
                         </div>
                     @endif
-                </div>
-            @endif
+
+                    @if($download['has_any'])
+                        <div class="s-project-action-panel__option{{ $project->external_url ? ' has-divider' : '' }}">
+                            <span class="s-project-action-panel__icon"><i class="fa-solid fa-download"></i></span>
+                            <div>
+                                <h2>Aplicativo desktop</h2>
+                                <p>Builds nativos com versão, arquitetura e hash para conferência.</p>
+                            </div>
+                            <a href="#arquivos" class="s-btn s-btn--ghost">
+                                Escolher download <i class="fa-solid fa-arrow-down"></i>
+                            </a>
+                        </div>
+                    @else
+                        <div class="s-project-action-panel__status{{ $project->external_url ? ' has-divider' : '' }}">
+                            <span><i></i> Aplicativo desktop</span>
+                            <strong>Em preparação</strong>
+                        </div>
+                    @endif
+                </aside>
+            </div>
 
             @if(session('download_unavailable'))
                 <div class="s-card" style="padding:14px 18px; margin-bottom:24px; border-color:rgba(248,113,113,0.3); background:rgba(248,113,113,0.08);">
@@ -95,9 +114,7 @@
                 </div>
             @endif
 
-            @if(! $download['has_any'])
-                <p class="s-meta">Sem arquivos disponíveis ainda.</p>
-            @else
+            @if($download['has_any'])
 
                 {{-- ─── Recomendado para você ─── --}}
                 @php($rec = $download['recommended'])
