@@ -33,13 +33,10 @@ class SiteController extends Controller
 
     public function downloads(): View
     {
+        // Vitrine completa: projetos de download, híbridos, de documentação (página
+        // curada, ex. ai-usagebar) E projeto-link puro (ex. SShvTerm → site oficial).
+        // A view escolhe o botão certo por tipo: "Ver arquivos" · "Instalar" · "Acessar site".
         $projects = Project::published()
-            // Projetos de download e híbridos entram; projeto-link puro (que
-            // redireciona pro site) fica de fora — não tem página de download.
-            ->where('redirect_to_site', false)
-            // Projeto de documentação (página curada, sem arquivos) também fica de fora
-            // da vitrine de downloads — ele vive só no menu "Projetos" e na home.
-            ->whereNull('page_view')
             ->with(['availableFiles' => fn ($q) => $q->orderBy('label')])
             ->orderBy('sort_order')
             ->orderByDesc('created_at')

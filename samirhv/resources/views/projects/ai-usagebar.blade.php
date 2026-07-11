@@ -65,6 +65,10 @@
                 <div>
                     <span class="s-kicker">Monitor de uso de IA</span>
                     <h1 style="font-family:var(--s-sans); font-size:2.2rem; font-weight:700; color:#f1f5f9; letter-spacing:-.02em; margin:4px 0 0;">ai<span style="color:#6366f1;">-</span>usagebar</h1>
+                    <p style="margin:9px 0 0; font-family:var(--s-sans); font-size:.9rem; color:#94a3b8; line-height:1.5;">
+                        Projeto de <a href="https://github.com/akitaonrails/ai-usagebar" target="_blank" rel="noopener" style="color:#818cf8; text-decoration:none; font-weight:600;">Fabio Akita</a>.
+                        As integrações de desktop (GNOME · macOS · Windows) mostradas aqui são contribuições do <a href="https://github.com/samirhvbr/ai-usagebar" target="_blank" rel="noopener" style="color:#818cf8; text-decoration:none;">fork do Samir</a>.
+                    </p>
                 </div>
             </header>
 
@@ -271,17 +275,17 @@
 
             {{-- ── CTA ──────────────────────────────────────────────────── --}}
             <div class="d-flex gap-3 flex-wrap" style="margin-top:44px;">
-                <a href="https://github.com/samirhvbr/ai-usagebar" target="_blank" rel="noopener" class="button button-rounded button-large m-0" style="background:#6366f1; border-color:#6366f1; color:#fff; font-family:var(--s-sans); font-weight:600; padding:14px 30px; box-shadow:0 4px 24px rgba(99,102,241,0.35);">
-                    <i class="fa-brands fa-github me-2"></i>Código no GitHub
+                <a href="https://github.com/akitaonrails/ai-usagebar" target="_blank" rel="noopener" class="button button-rounded button-large m-0" style="background:#6366f1; border-color:#6366f1; color:#fff; font-family:var(--s-sans); font-weight:600; padding:14px 30px; box-shadow:0 4px 24px rgba(99,102,241,0.35);">
+                    <i class="fa-brands fa-github me-2"></i>Repositório de Fabio Akita
                 </a>
                 <a href="https://github.com/samirhvbr/ai-usagebar/blob/master/DESKTOP.md" target="_blank" rel="noopener" class="button button-rounded button-large button-border m-0" style="border-color:rgba(99,102,241,0.45); color:#a5b4fc; font-family:var(--s-sans); font-weight:600; padding:14px 30px;">
-                    <i class="fa-solid fa-book me-2"></i>Guia desktop completo
+                    <i class="fa-solid fa-book me-2"></i>Guia desktop (fork)
                 </a>
             </div>
 
             <p style="margin-top:30px; font-family:'JetBrains Mono',monospace; font-size:.72rem; color:#64748b; line-height:1.7;">
                 <i class="fa-solid fa-circle-info me-1" style="color:#6366f1;"></i>
-                Projeto open-source (MIT), port em Rust do <a href="https://github.com/mryll/claudebar" target="_blank" rel="noopener" style="color:#818cf8;">claudebar</a> com suporte a mais provedores. Alguns endpoints são não-documentados; as marcas citadas pertencem aos respectivos donos.
+                ai-usagebar é um projeto de <a href="https://github.com/akitaonrails/ai-usagebar" target="_blank" rel="noopener" style="color:#818cf8;">Fabio Akita</a> — open-source (MIT), port em Rust do <a href="https://github.com/mryll/claudebar" target="_blank" rel="noopener" style="color:#818cf8;">claudebar</a> com suporte a mais provedores. As integrações nativas de desktop (GNOME/macOS/Windows) mostradas aqui vêm do <a href="https://github.com/samirhvbr/ai-usagebar" target="_blank" rel="noopener" style="color:#818cf8;">fork do Samir</a>. Alguns endpoints são não-documentados; as marcas citadas pertencem aos respectivos donos.
             </p>
 
         </div>
