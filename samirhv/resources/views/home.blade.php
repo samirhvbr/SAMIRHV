@@ -3,7 +3,7 @@
 @section('title', 'Samirhv')
 @section('description', 'Projetos e ferramentas de Samir Hanna Verza disponibilizados para download.')
 
-@section('content'
+@section('content')
 
     {{-- ═══ HERO ═══ --}}
     <section class="s-hero">
