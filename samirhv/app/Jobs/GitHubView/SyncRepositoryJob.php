@@ -12,6 +12,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Sincroniza um repositório com o GitHub: commits (GraphQL, upsert incremental)
@@ -33,15 +34,24 @@ class SyncRepositoryJob implements ShouldQueue
     {
         $this->repository->startSync();
 
+        // Commits são o dado essencial (o heatmap). Falha aqui → repo 'failed'.
         try {
             $this->syncCommits($client);
-            $this->syncWorkflowRuns($client);
-            $this->repository->finishSync();
         } catch (\Throwable $e) {
-            // Qualquer erro (API do GitHub OU banco) → marca 'failed' com a mensagem,
-            // em vez de estourar 500 e deixar o repo travado em 'syncing'.
             $this->repository->failSync($e->getMessage());
+
+            return;
         }
+
+        // CI é BEST-EFFORT: timeout / histórico grande de runs NÃO deve derrubar um
+        // repo cujos commits já sincronizaram. Loga o aviso e segue como 'synced'.
+        try {
+            $this->syncWorkflowRuns($client);
+        } catch (\Throwable $e) {
+            Log::warning("GitHub View: CI sync falhou p/ {$this->repository->fullName()}: {$e->getMessage()}");
+        }
+
+        $this->repository->finishSync();
     }
 
     private function syncCommits(GitHubClient $client): void

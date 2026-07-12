@@ -138,6 +138,7 @@ class GitHubClient
             $body = $this->restGet("/repos/{$owner}/{$name}/actions/runs", [
                 'per_page' => self::PAGE_SIZE,
                 'page' => $page,
+                'exclude_pull_requests' => 'true', // encolhe MUITO o payload (evita timeout)
             ]);
             $batch = $body['workflow_runs'] ?? [];
             if ($batch === []) {
@@ -245,7 +246,9 @@ class GitHubClient
         return Http::withToken($this->token)
             ->acceptJson()
             ->withHeaders(['User-Agent' => 'samirhv-github-view'])
-            ->timeout(30);
+            ->connectTimeout(10)
+            ->timeout(45)
+            ->retry(2, 1000); // 1 retry em falha transiente (timeout/5xx)
     }
 
     /**
