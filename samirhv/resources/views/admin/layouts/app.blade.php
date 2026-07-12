@@ -270,6 +270,9 @@
             <a href="{{ route('admin.access-audit.index') }}" class="nav-link {{ $r === 'admin.access-audit.index' ? 'active' : '' }}">
                 <i class="fa-solid fa-user-shield"></i><span>Aud. de Acesso</span>
             </a>
+            <a href="{{ route('admin.github-view.index') }}" class="nav-link {{ str_starts_with((string) $r, 'admin.github-view') ? 'active' : '' }}">
+                <i class="fa-solid fa-code-branch"></i><span>GitHub View</span>
+            </a>
 
             <div class="nav-section">AI</div>
             <a href="{{ route('admin.ai-memory.dashboard') }}" class="nav-link {{ str_starts_with((string) $r, 'admin.ai-memory') ? 'active' : '' }}">
