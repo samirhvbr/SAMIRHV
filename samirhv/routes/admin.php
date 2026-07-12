@@ -61,6 +61,7 @@ Route::prefix('admin')->name('admin.')
             ->group(function () {
                 Route::get('/', 'index')->name('index');
                 Route::post('/repos', 'store')->name('repos.store');
+                Route::post('/import', 'importAll')->name('import'); // importa todos os repos do usuário
 
                 Route::prefix('repos/{owner}/{name}')
                     ->where(['owner' => '[\w.-]+', 'name' => '[\w.-]+'])

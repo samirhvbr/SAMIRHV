@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Jobs\GitHubView\SyncRepositoryJob;
 use App\Models\GitHubView\Repository;
+use App\Services\GitHub\GitHubClient;
 use App\Services\GitHub\GitHubException;
 use App\Services\GitHub\Visualizations\CommitHeatmap;
 use Illuminate\Http\JsonResponse;
@@ -46,6 +47,48 @@ class GitHubViewController extends Controller
         $repository = Repository::firstOrCreate(['owner' => $owner, 'name' => $name]);
 
         return $this->runSync($repository, "Repositório {$repository->fullName()} adicionado e sincronizado.");
+    }
+
+    /**
+     * Importa TODOS os repositórios do usuário autenticado (via /user/repos) como
+     * PENDENTES — 1 chamada de API, SEM sincronizar (sincronizar todos de uma vez
+     * seria pesado/rate-limit). Depois é só sincronizar cada um. Idempotente.
+     */
+    public function importAll(): RedirectResponse
+    {
+        try {
+            $repos = app(GitHubClient::class)->userRepositories();
+        } catch (GitHubException $e) {
+            return redirect()->route('admin.github-view.index')->with('error', 'GitHub: '.$e->getMessage());
+        }
+
+        $created = 0;
+        $skipped = 0;
+
+        foreach ($repos as $repo) {
+            $fullName = (string) ($repo['full_name'] ?? '');
+            if (! str_contains($fullName, '/')) {
+                continue;
+            }
+            [$owner, $name] = explode('/', $fullName, 2);
+
+            $model = Repository::firstOrNew(['owner' => $owner, 'name' => $name]);
+            if ($model->exists) {
+                $skipped++;
+
+                continue;
+            }
+            $model->fill(['description' => $repo['description'] ?? null, 'sync_status' => 'pending'])->save();
+            $created++;
+        }
+
+        if ($created === 0 && $skipped === 0) {
+            return redirect()->route('admin.github-view.index')
+                ->with('error', 'Nenhum repositório retornado pela API (confira o GITHUB_TOKEN).');
+        }
+
+        return redirect()->route('admin.github-view.index')->with('status',
+            "Importados {$created} novo(s); {$skipped} já existiam. Sincronize cada um pra ver os gráficos.");
     }
 
     /** Página do repositório com as visualizações (Fatia 1: heatmap). */

@@ -11,7 +11,9 @@
     .gh-btn{ display:inline-flex; align-items:center; gap:7px; background:var(--accent); color:#fff; border:1px solid transparent;
         border-radius:var(--radius-sm); padding:10px 16px; font:inherit; font-weight:600; cursor:pointer; text-decoration:none; }
     .gh-btn:hover{ filter:brightness(1.08); }
-    .gh-err{ color:var(--danger); font-size:.85rem; margin:8px 0 18px; }
+    .gh-btn--ghost{ background:transparent; color:var(--txt); border:1px solid var(--line); }
+    .gh-btn--ghost:hover{ background:var(--accent-soft); border-color:var(--line-hover); filter:none; }
+    .gh-err{ color:var(--danger); font-size:.85rem; margin:8px 0 12px; }
     .gh-list{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; margin-top:22px; }
     .gh-repo{ display:block; background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-md);
         padding:16px; text-decoration:none; color:inherit; transition:border-color .15s, transform .15s; }
@@ -39,6 +41,14 @@
         <button type="submit" class="gh-btn"><i class="fa-solid fa-plus"></i> Adicionar &amp; sincronizar</button>
     </form>
     @error('repository')<p class="gh-err">{{ $message }}</p>@enderror
+
+    <form method="POST" action="{{ route('admin.github-view.import') }}" style="margin-bottom:22px"
+          onsubmit="return confirm('Importar TODOS os seus repositórios do GitHub como pendentes? (você sincroniza cada um depois)')">
+        @csrf
+        <button type="submit" class="gh-btn gh-btn--ghost">
+            <i class="fa-solid fa-cloud-arrow-down"></i> Importar todos os meus repos
+        </button>
+    </form>
 
     @if($repositories->isEmpty())
         <div class="gh-empty">
