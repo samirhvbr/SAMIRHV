@@ -258,7 +258,7 @@ class GitHubClient
             'sha' => $node['oid'] ?? null,
             'message' => $node['messageHeadline'] ?? null,
             'author_login' => $node['author']['user']['login'] ?? ($node['author']['name'] ?? null),
-            'committed_at' => $node['committedDate'] ?? null,
+            'committed_at' => $this->toDbDate($node['committedDate'] ?? null),
             'additions' => (int) ($node['additions'] ?? 0),
             'deletions' => (int) ($node['deletions'] ?? 0),
         ];
@@ -277,7 +277,17 @@ class GitHubClient
             'status' => $run['status'] ?? null,
             'conclusion' => $run['conclusion'] ?? null,
             'branch' => $run['head_branch'] ?? null,
-            'run_started_at' => $run['run_started_at'] ?? ($run['created_at'] ?? null),
+            'run_started_at' => $this->toDbDate($run['run_started_at'] ?? ($run['created_at'] ?? null)),
         ];
+    }
+
+    /**
+     * ISO 8601 (ex.: "2026-07-10T21:38:16Z") → "Y-m-d H:i:s" em UTC. Necessário
+     * porque `upsert()` do Eloquent BYPASSA o cast do model — a string crua iria
+     * direto pro MySQL, que recusa o formato ISO (SQLite do original aceitava).
+     */
+    private function toDbDate(?string $iso): ?string
+    {
+        return $iso ? Carbon::parse($iso)->utc()->format('Y-m-d H:i:s') : null;
     }
 }

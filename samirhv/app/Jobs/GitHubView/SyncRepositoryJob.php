@@ -6,7 +6,6 @@ use App\Models\GitHubView\Commit;
 use App\Models\GitHubView\Repository;
 use App\Models\GitHubView\WorkflowRun;
 use App\Services\GitHub\GitHubClient;
-use App\Services\GitHub\GitHubException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -38,7 +37,9 @@ class SyncRepositoryJob implements ShouldQueue
             $this->syncCommits($client);
             $this->syncWorkflowRuns($client);
             $this->repository->finishSync();
-        } catch (GitHubException $e) {
+        } catch (\Throwable $e) {
+            // Qualquer erro (API do GitHub OU banco) → marca 'failed' com a mensagem,
+            // em vez de estourar 500 e deixar o repo travado em 'syncing'.
             $this->repository->failSync($e->getMessage());
         }
     }
