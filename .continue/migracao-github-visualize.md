@@ -54,7 +54,7 @@ controllers), **traduzir 1:1**. Sem inventar arquitetura nova.
 | Views `.erb` (Tailwind) | Blade no **layout do admin** | mecânico |
 | Stimulus (canvas charts) | **reaproveitar** como módulos ES | baixo |
 | Turbo (sync ao vivo) | polling (`fetch`) — o controller já faz | baixo |
-| SQLite | **MySQL** do samirhv (nossa regra) | trivial |
+| **SQLite** (banco) | **MySQL** — sem migração de dados (ressync do GitHub), ver §4.1 | trivial |
 
 ## 4. Modelo de dados (migrations)
 
@@ -87,6 +87,33 @@ timestamps. Índices: `(repository_id, committed_at)`, `(repository_id, sha)` un
   `summary()` (message truncada 100).
 - `WorkflowRun`: `belongsTo(repository)`, scope `chronological` (`run_started_at`),
   `green()` (`conclusion==success`), `red()` (`failure|timed_out|startup_failure`).
+
+### 4.1 Banco: SQLite → MySQL (não usar SQLite)
+
+O original roda **SQLite**; aqui é **MySQL** (o do samirhv). O ponto que torna
+isso **trivial**: **não há migração de dados**. As tabelas nascem via *migrations*
+do Laravel e os dados vêm de **re-sync do GitHub** — a fonte da verdade é a **API**,
+não o arquivo `.sqlite3`. Ou seja, "migrar do SQLite" = **criar as 3 tabelas no
+MySQL e ressincronizar**; o arquivo SQLite nunca é lido nem importado.
+
+Ferramental **agnóstico de banco**: migrations + Eloquent + `upsert()` rodam igual
+em MySQL/MariaDB e PostgreSQL. Não há SQL cru específico de SQLite pra portar.
+
+**3 cuidados** (SQLite é *typeless*/leniente; MySQL/Postgres são estritos):
+- **`text` e não `VARCHAR(255)`** — no SQLite `string` é ilimitado; o `string()`
+  do Laravel vira `VARCHAR(255)` e **truncaria**. Usar **`text`** em `message`,
+  `description` e `sync_error` (mensagens de commit e descrições passam de 255).
+- **`github_id` = `unsignedBigInteger`** — IDs de run do GitHub são grandes (Rails
+  usava `limit: 8`); `integer` estoura.
+- **Unicidade *case-insensitive* de `name`** — o Rails valida com
+  `case_sensitive: false`. O **MySQL** com collation padrão (`utf8mb4_unicode_ci`)
+  já entrega isso **de graça**; o **Postgres é case-sensitive** → exigiria índice
+  funcional `LOWER()` ou `citext`. FKs são nativas nos dois (melhor que SQLite).
+
+**Recomendação: MySQL/MariaDB** — o samirhv já usa (reaproveita a conexão, zero
+engine novo) e o collation CI dá o comportamento do Rails sem esforço. Postgres
+funciona, mas adiciona engine + trabalho de `citext`/`LOWER()` sem ganho aqui.
+**Dificuldade: trivial** — só definir os tipos certos e escolher MySQL.
 
 ## 5. Cliente GitHub (`GitHubClient`)
 
@@ -181,6 +208,8 @@ já faz isso; sem Turbo/WebSocket.
       (reaproveita o canvas), migrar p/ B depois se valer.
 - [ ] **Tailwind escopado vs CSS do admin** no markup dos cards (§9). Recomendo CSS
       do admin.
+- [ ] **MySQL vs PostgreSQL** (§4.1). Recomendo **MySQL** (samirhv já usa; unicidade
+      *case-insensitive* de graça). Sem migração de dados — só ressync.
 - [ ] **Fila:** on-demand + scheduler vs `queue:work` 24/7 (§6).
 - [ ] **Rate-limit do GitHub** (GraphQL tem custo por página) — os tetos 2000/300
       já protegem; validar com repos grandes.
