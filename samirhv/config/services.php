@@ -51,6 +51,7 @@ return [
     'github' => [
         'token' => env('GITHUB_TOKEN'),
         'owner' => env('GITHUB_OWNER'),
+        'timezone' => env('APP_TIME_ZONE'), // fuso p/ bucket dos charts (fallback: app.timezone)
     ],
 
 ];
