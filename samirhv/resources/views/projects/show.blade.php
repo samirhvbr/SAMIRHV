@@ -108,6 +108,9 @@
                 </aside>
             </div>
 
+            {{-- Seção "Os modelos por trás" — só na ShvIA (história híbrida: on-prem + nuvem BYOK). --}}
+            @includeWhen($project->slug === 'shvia', 'partials.shvia-models')
+
             @if(session('download_unavailable'))
                 <div class="s-card" style="padding:14px 18px; margin-bottom:24px; border-color:rgba(248,113,113,0.3); background:rgba(248,113,113,0.08);">
                     <span class="s-body" style="color:#fca5a5; font-size:0.9rem;">O arquivo <strong>{{ session('download_unavailable') }}</strong> está indisponível no momento.</span>
