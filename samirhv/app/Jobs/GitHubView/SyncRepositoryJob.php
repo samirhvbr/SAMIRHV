@@ -1,0 +1,94 @@
+<?php
+
+namespace App\Jobs\GitHubView;
+
+use App\Models\GitHubView\Commit;
+use App\Models\GitHubView\Repository;
+use App\Models\GitHubView\WorkflowRun;
+use App\Services\GitHub\GitHubClient;
+use App\Services\GitHub\GitHubException;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Carbon;
+
+/**
+ * Sincroniza um repositório com o GitHub: commits (GraphQL, upsert incremental)
+ * + workflow runs (REST). Porte de app/jobs/sync_repository_job.rb.
+ *
+ * Roda na fila OU síncrono (`SyncRepositoryJob::dispatchSync($repo)`), já que o
+ * samirhv não roda `queue:work` 24/7 hoje. Ver §6 do plano de migração.
+ */
+class SyncRepositoryJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    private const INITIAL_COMMIT_LIMIT = 2000;
+    private const WORKFLOW_RUN_LIMIT = 300;
+
+    public function __construct(public readonly Repository $repository) {}
+
+    public function handle(GitHubClient $client): void
+    {
+        $this->repository->startSync();
+
+        try {
+            $this->syncCommits($client);
+            $this->syncWorkflowRuns($client);
+            $this->repository->finishSync();
+        } catch (GitHubException $e) {
+            $this->repository->failSync($e->getMessage());
+        }
+    }
+
+    private function syncCommits(GitHubClient $client): void
+    {
+        // Incremental: só o que veio depois do último commit já salvo (+1s).
+        $latest = $this->repository->commits()->max('committed_at');
+        $since = $latest ? Carbon::parse($latest)->addSecond() : null;
+
+        $fetched = 0;
+        $overview = $client->repositoryOverview(
+            $this->repository->owner,
+            $this->repository->name,
+            since: $since,
+            maxCommits: self::INITIAL_COMMIT_LIMIT,
+            onBatch: function (array $batch) use (&$fetched): void {
+                $rows = array_map(
+                    fn (array $row): array => $row + ['repository_id' => $this->repository->id],
+                    $batch,
+                );
+                Commit::upsert($rows, ['repository_id', 'sha']);
+                $fetched += count($batch);
+                $this->repository->update(['sync_progress' => "{$fetched} commits fetched"]);
+            },
+        );
+
+        $this->repository->update([
+            'description' => $overview['description'],
+            'default_branch' => $overview['default_branch'],
+        ]);
+    }
+
+    private function syncWorkflowRuns(GitHubClient $client): void
+    {
+        $this->repository->update(['sync_progress' => 'fetching CI runs']);
+
+        $runs = $client->workflowRuns(
+            $this->repository->owner,
+            $this->repository->name,
+            self::WORKFLOW_RUN_LIMIT,
+        );
+
+        $rows = array_map(
+            fn (array $run): array => $run + ['repository_id' => $this->repository->id],
+            $runs,
+        );
+
+        if ($rows !== []) {
+            WorkflowRun::upsert($rows, ['repository_id', 'github_id']);
+        }
+    }
+}
