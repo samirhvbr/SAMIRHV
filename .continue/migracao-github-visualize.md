@@ -246,3 +246,32 @@ já faz isso; sem Turbo/WebSocket.
 `app/jobs/sync_repository_job.rb` · `app/presenters/visualizations/*` ·
 `app/javascript/controllers/*` (canvas) · `.env.example` (envs) ·
 `README.md` (features). Fork: `github.com/samirhvbr/github-visualize`.
+
+## 15. Estado da implementação + paridade com o upstream
+
+**Branch:** `feat/github-view` (organizada p/ virar PR). Feito (**Fatia 1**):
+- **Backend:** 3 migrations `github_*`, models Eloquent, `GitHubClient` (GraphQL/
+  REST), `SyncRepositoryJob` (upsert incremental), `config/services.github`.
+- **Frontend:** rotas `/admin/github-view`, `GitHubViewController`, item de menu
+  (em "Monitoramento"), tela de listagem/adição, e o **heatmap dia×hora**
+  (`CommitHeatmap` + Blade + `public/js/admin/github-view/heatmap.js`, port do
+  Stimulus → ES vanilla).
+- **.env:** `GITHUB_TOKEN` · `GITHUB_OWNER` · `APP_TIME_ZONE`.
+- ⚠️ Sync roda **síncrono** (`dispatchSync`) — repo grande pode demorar no request;
+  migrar p/ fila quando incomodar.
+
+**Falta (próximas fatias):** timeline replay · "race to green" (CI lanes) ·
+dashboard completo (autocomplete `/suggestions`) · sync status por polling.
+
+**Paridade com o upstream (Akita):**
+- Clone Rails de referência: `~/x/github-visualize` — remotes: `origin` = seu fork,
+  `upstream` = `akitaonrails/github-visualize`.
+- **Sincronizado até:** `b0e9f59` (HEAD do upstream em 12/07/2026).
+- **Quando o Akita atualizar:**
+  1. `git -C ~/x/github-visualize fetch upstream`
+  2. `git log --oneline b0e9f59..upstream/master` → o que mudou (a *spec*).
+  3. Aplicar no SAMIRHV: **JS/canvas** e a **query GraphQL** copiam/adaptam
+     ~verbatim; **Ruby** re-traduz pro Laravel (a tradução 1:1 deste doc).
+  4. Atualizar este marcador (`Sincronizado até: <novo sha>`).
+- **Não é** copiar arquivo direto (Rails/Ruby ≠ Laravel/PHP): o fork é radar de
+  upstream + referência de diff, não fonte de código PHP.
