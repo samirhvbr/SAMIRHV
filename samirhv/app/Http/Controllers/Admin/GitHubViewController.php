@@ -8,6 +8,7 @@ use App\Models\GitHubView\Repository;
 use App\Services\GitHub\GitHubClient;
 use App\Services\GitHub\GitHubException;
 use App\Services\GitHub\Visualizations\CommitHeatmap;
+use App\Services\GitHub\Visualizations\RepositoryOverview;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -28,11 +29,21 @@ class GitHubViewController extends Controller
 
     private const DEFAULT_WINDOW = 42;
 
-    /** Lista os repositórios monitorados. */
-    public function index(): View
+    /** Ordenações do dashboard (igual ao Rails SORTS). "updated" = último commit. */
+    private const SORTS = ['updated_desc', 'updated_asc', 'name_asc', 'name_desc', 'created_desc', 'created_asc'];
+
+    private const DEFAULT_SORT = 'updated_desc';
+
+    /** Dashboard: barras de commits/repo + cards com atividade diária, ordenáveis. */
+    public function index(Request $request): View
     {
+        $sort = in_array($request->query('sort'), self::SORTS, true) ? (string) $request->query('sort') : self::DEFAULT_SORT;
+        $overview = new RepositoryOverview(Repository::all());
+
         return view('admin.github-view.index', [
-            'repositories' => Repository::query()->orderBy('owner')->orderBy('name')->get(),
+            'repositories' => $overview->sorted($sort),
+            'overview' => $overview,
+            'sort' => $sort,
             'defaultOwner' => Repository::defaultOwner(),
         ]);
     }
