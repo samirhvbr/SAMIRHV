@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Services\AuditLogger;
+use App\Services\GithubReleaseChecker;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class ProjectController extends Controller
@@ -93,6 +95,7 @@ class ProjectController extends Controller
             'description' => ['nullable', 'string', 'max:5000'],
             'external_url' => ['nullable', 'url:http,https', 'max:2048'],
             'redirect_to_site' => ['nullable', 'boolean'],
+            'upstream_repo' => ['nullable', 'string', 'max:140'],
             'category' => ['nullable', 'string', 'max:60'],
             'icon' => ['nullable', 'string', 'max:60'],
             'sort_order' => ['nullable', 'integer', 'min:0', 'max:9999'],
@@ -105,6 +108,16 @@ class ProjectController extends Controller
         $data['external_url'] = ($data['external_url'] ?? null) ?: null;
         // Só faz sentido redirecionar quando há site externo.
         $data['redirect_to_site'] = $data['external_url'] ? $request->boolean('redirect_to_site') : false;
+
+        // Normaliza o upstream para "owner/repo" (aceita URL do GitHub). Se veio
+        // preenchido mas não dá para extrair, é erro de formato — não engole.
+        $rawRepo = $data['upstream_repo'] ?? null;
+        $data['upstream_repo'] = GithubReleaseChecker::normalizeRepo($rawRepo);
+        if (filled($rawRepo) && $data['upstream_repo'] === null) {
+            throw ValidationException::withMessages([
+                'upstream_repo' => 'Formato inválido. Use "owner/repo" ou a URL do repositório no GitHub.',
+            ]);
+        }
 
         return $data;
     }

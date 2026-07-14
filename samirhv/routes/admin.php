@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AccessAuditController;
 use App\Http\Controllers\Admin\AiMemoryController;
 use App\Http\Controllers\Admin\AuditController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\MonitorController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\ProjectFileController;
@@ -29,6 +30,9 @@ Route::prefix('admin')->name('admin.')
         Route::patch('/projetos/{project}/arquivos/{file}/disponivel', [ProjectFileController::class, 'toggleAvailable'])->name('projects.files.available');
         Route::put('/projetos/{project}/arquivos/{file}', [ProjectFileController::class, 'update'])->name('projects.files.update');
         Route::delete('/projetos/{project}/arquivos/{file}', [ProjectFileController::class, 'destroy'])->name('projects.files.destroy');
+
+        // Monitor de versões (forks OSS: nossa versão × upstream no GitHub)
+        Route::get('/monitor', [MonitorController::class, 'index'])->name('monitor.index');
 
         // Auditorias
         Route::get('/auditoria', [AuditController::class, 'index'])->name('audit.index');

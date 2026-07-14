@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\SemVer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -12,7 +13,7 @@ class Project extends Model
 
     protected $fillable = [
         'title', 'slug', 'description', 'category', 'icon', 'page_view', 'external_url',
-        'redirect_to_site', 'is_published', 'sort_order',
+        'redirect_to_site', 'upstream_repo', 'is_published', 'sort_order',
     ];
 
     protected $casts = [
@@ -72,6 +73,36 @@ class Project extends Model
     public function getPublicUrlAttribute(): string
     {
         return $this->redirectsToSite() ? $this->external_url : route('project.show', $this);
+    }
+
+    /** É fork de um OSS com upstream rastreável no monitor? */
+    public function hasUpstream(): bool
+    {
+        return filled($this->upstream_repo);
+    }
+
+    /** URL do repositório upstream no GitHub (para linkar no monitor). */
+    public function getUpstreamUrlAttribute(): ?string
+    {
+        return $this->upstream_repo ? 'https://github.com/'.$this->upstream_repo : null;
+    }
+
+    /**
+     * "Nossa versão": a maior versão semver entre os arquivos disponíveis
+     * (o que servimos hoje). Sem versão semver, cai para a versão do arquivo
+     * mais recente por data. Null = nenhum arquivo versionado. Prefere a relação
+     * já carregada (evita N+1 no monitor, que faz eager-load de availableFiles).
+     */
+    public function localVersion(): ?string
+    {
+        $files = $this->relationLoaded('availableFiles')
+            ? $this->availableFiles
+            : $this->availableFiles()->get();
+
+        $versions = $files->pluck('version')->filter()->all();
+
+        return SemVer::max($versions)
+            ?? $files->sortByDesc(fn (ProjectFile $f) => $f->effective_date)->first()?->version;
     }
 
     public function files(): HasMany

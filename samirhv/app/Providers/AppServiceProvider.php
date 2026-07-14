@@ -31,6 +31,25 @@ class AppServiceProvider extends ServiceProvider
         $this->configureRateLimiters();
         $this->registerAuthEventListeners();
         $this->shareNavProjects();
+        $this->shareAdminVersion();
+    }
+
+    /**
+     * Expõe a versão da app (raiz `version.md`, um nível acima do Laravel) ao
+     * layout do painel. Composer em vez de config('app.version') de propósito:
+     * roda em runtime, então não fica "assado" por `config:cache` no deploy —
+     * mostra a versão realmente publicada. Lê o arquivo uma vez por processo.
+     */
+    private function shareAdminVersion(): void
+    {
+        View::composer('admin.layouts.app', function ($view) {
+            static $version = null;
+            if ($version === null) {
+                $raw = @file_get_contents(base_path('../version.md'));
+                $version = $raw !== false ? trim($raw) : '';
+            }
+            $view->with('appVersion', $version);
+        });
     }
 
     /** Injeta os projetos publicados no menu "Projetos" do layout público. */

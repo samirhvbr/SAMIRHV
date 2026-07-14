@@ -85,6 +85,15 @@
         .sidebar-user-name{font-size:.78rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
         .sidebar-user-email{font-size:.66rem;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
+        .sidebar-version{
+            display:flex;align-items:center;justify-content:center;gap:6px;
+            padding:10px 8px 2px;
+            font-family:'JetBrains Mono',monospace;font-size:.68rem;
+            color:var(--dim);letter-spacing:.02em;
+        }
+        .sidebar-version i{font-size:.62rem;opacity:.55}
+        .sidebar-version b{color:var(--muted);font-weight:600}
+
         /* ── Main ── */
         .main{flex:1;min-width:0;display:flex;flex-direction:column}
         .topbar{
@@ -234,6 +243,8 @@
             .nav-link{justify-content:center;padding:10px 6px}
             .sidebar-user{justify-content:center;padding:10px 4px}
             .sidebar-user-avatar{width:26px;height:26px;font-size:.62rem}
+            .sidebar-version{padding:10px 2px 2px;font-size:.6rem}
+            .sidebar-version i{display:none}
         }
         @media(max-width:560px){
             .admin-stats-grid,.an-grid-3,.an-grid-2{grid-template-columns:1fr}
@@ -264,6 +275,9 @@
             </a>
 
             <div class="nav-section">Monitoramento</div>
+            <a href="{{ route('admin.monitor.index') }}" class="nav-link {{ $r === 'admin.monitor.index' ? 'active' : '' }}">
+                <i class="fa-solid fa-code-compare"></i><span>Monitor</span>
+            </a>
             <a href="{{ route('admin.audit.index') }}" class="nav-link {{ $r === 'admin.audit.index' ? 'active' : '' }}">
                 <i class="fa-solid fa-chart-line"></i><span>Auditoria</span>
             </a>
@@ -301,6 +315,12 @@
                 <i class="fa-solid fa-right-from-bracket"></i><span>Sair</span>
             </button>
         </form>
+
+        @if(!empty($appVersion))
+            <div class="sidebar-version" title="Versão do painel (version.md)">
+                <i class="fa-solid fa-code-branch"></i><b>v{{ $appVersion }}</b>
+            </div>
+        @endif
     </aside>
 
     <main class="main">

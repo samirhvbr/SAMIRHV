@@ -40,6 +40,17 @@
     </div>
 </div>
 
+<div class="form-row">
+    <label for="upstream_repo">Repositório upstream (GitHub)</label>
+    <input type="text" id="upstream_repo" name="upstream_repo" value="{{ old('upstream_repo', $project->upstream_repo) }}" maxlength="140" placeholder="ex: akitaonrails/ai-usagebar">
+    <div class="hint">
+        Só para <strong>forks de OSS</strong>: o Monitor compara a última release
+        deste repo com a nossa versão e sinaliza quando o original está à frente.
+        Aceita <code>owner/repo</code> ou a URL completa do GitHub. Vazio = fora do monitor.
+    </div>
+    @error('upstream_repo')<div class="err">{{ $message }}</div>@enderror
+</div>
+
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
     <div class="form-row">
         <label for="category">Categoria</label>

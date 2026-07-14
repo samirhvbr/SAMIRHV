@@ -53,7 +53,7 @@ Trabalhar sobre uma base desatualizada gera conflitos. Puxe primeiro, sempre. Pa
 
 **Público** (`routes/web.php`): `/` (home, vitrine), `/downloads` (lista), `/p/{slug}` (projeto), `/d/{file}` (download com contagem + auditoria), `/login`, `/logout`.
 
-**Admin** (`routes/admin.php`, prefixo `/admin`, middleware `auth,admin,password.changed`): dashboard, `projetos` (CRUD), `projetos/{p}/arquivos` (upload), `auditoria` (downloads + analytics), `auditoria-acesso` (ações/logins), `perfil`.
+**Admin** (`routes/admin.php`, prefixo `/admin`, middleware `auth,admin,password.changed`): dashboard, `projetos` (CRUD), `projetos/{p}/arquivos` (upload), `monitor` (versão nossa × upstream OSS no GitHub, via `GithubReleaseChecker`), `auditoria` (downloads + analytics), `auditoria-acesso` (ações/logins), `perfil`.
 
 **Modelo de dados:** `Project` → `hasMany ProjectFile`. Cada arquivo tem `downloads_count`; cada download gera uma linha em `download_logs`. Auditoria de visitas em `page_views` (via middleware `TrackPageView`), ações do admin em `activity_logs` (`AuditLogger`), autenticação em `auth_events` (listeners no `AppServiceProvider`).
 
