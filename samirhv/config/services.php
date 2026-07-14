@@ -45,4 +45,13 @@ return [
         'cookie_domain' => env('MATOMO_COOKIE_DOMAIN'),
     ],
 
+    // GitHub View (admin): token + owner default do dashboard de visualização de
+    // repositórios (porte do github-visualize). Token fine-grained com escopo
+    // MÍNIMO: Contents:read + Actions:read. Ver .continue/migracao-github-visualize.md.
+    'github' => [
+        'token' => env('GITHUB_TOKEN'),
+        'owner' => env('GITHUB_OWNER'),
+        'timezone' => env('APP_TIME_ZONE'), // fuso p/ bucket dos charts (fallback: app.timezone)
+    ],
+
 ];

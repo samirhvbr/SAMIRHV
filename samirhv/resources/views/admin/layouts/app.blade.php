@@ -86,13 +86,13 @@
         .sidebar-user-email{font-size:.66rem;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
         .sidebar-version{
-            display:flex;align-items:center;justify-content:center;gap:6px;
-            padding:10px 8px 2px;
-            font-family:'JetBrains Mono',monospace;font-size:.68rem;
+            display:flex;align-items:center;gap:5px;
+            margin-top:3px;
+            font-family:'JetBrains Mono',monospace;font-size:.62rem;
             color:var(--dim);letter-spacing:.02em;
         }
-        .sidebar-version i{font-size:.62rem;opacity:.55}
-        .sidebar-version b{color:var(--muted);font-weight:600}
+        .sidebar-version i{font-size:.56rem;opacity:.5}
+        .sidebar-version span{color:var(--muted);font-weight:600}
 
         /* ── Main ── */
         .main{flex:1;min-width:0;display:flex;flex-direction:column}
@@ -243,8 +243,6 @@
             .nav-link{justify-content:center;padding:10px 6px}
             .sidebar-user{justify-content:center;padding:10px 4px}
             .sidebar-user-avatar{width:26px;height:26px;font-size:.62rem}
-            .sidebar-version{padding:10px 2px 2px;font-size:.6rem}
-            .sidebar-version i{display:none}
         }
         @media(max-width:560px){
             .admin-stats-grid,.an-grid-3,.an-grid-2{grid-template-columns:1fr}
@@ -284,6 +282,9 @@
             <a href="{{ route('admin.access-audit.index') }}" class="nav-link {{ $r === 'admin.access-audit.index' ? 'active' : '' }}">
                 <i class="fa-solid fa-user-shield"></i><span>Aud. de Acesso</span>
             </a>
+            <a href="{{ route('admin.github-view.index') }}" class="nav-link {{ str_starts_with((string) $r, 'admin.github-view') ? 'active' : '' }}">
+                <i class="fa-solid fa-code-branch"></i><span>GitHub View</span>
+            </a>
 
             <div class="nav-section">AI</div>
             <a href="{{ route('admin.ai-memory.dashboard') }}" class="nav-link {{ str_starts_with((string) $r, 'admin.ai-memory') ? 'active' : '' }}">
@@ -303,6 +304,11 @@
             <div class="sidebar-user-info">
                 <div class="sidebar-user-name">{{ auth()->user()->name ?? 'Admin' }}</div>
                 <div class="sidebar-user-email">{{ auth()->user()->email ?? '' }}</div>
+                @if(!empty($appVersion))
+                    <div class="sidebar-version" title="Versão do painel (version.md)">
+                        <i class="fa-solid fa-code-branch"></i><span>v{{ $appVersion }}</span>
+                    </div>
+                @endif
             </div>
         </div>
 
@@ -315,12 +321,6 @@
                 <i class="fa-solid fa-right-from-bracket"></i><span>Sair</span>
             </button>
         </form>
-
-        @if(!empty($appVersion))
-            <div class="sidebar-version" title="Versão do painel (version.md)">
-                <i class="fa-solid fa-code-branch"></i><b>v{{ $appVersion }}</b>
-            </div>
-        @endif
     </aside>
 
     <main class="main">

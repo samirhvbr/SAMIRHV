@@ -150,6 +150,9 @@
                     <div class="row align-items-center justify-content-between py-3">
                         <div class="col-md-6 s-meta" style="font-size: 0.8rem;">
                             &copy; {{ date('Y') }} Samirhv. Todos os direitos reservados.
+                            @if(!empty($appVersion))
+                                <span style="color: var(--s-faint); margin-left: .45rem; font-family: 'JetBrains Mono', monospace; font-size: .74rem;">v{{ $appVersion }}</span>
+                            @endif
                         </div>
                         <div class="col-md-6 d-flex justify-content-md-end mt-2 mt-md-0 align-items-center gap-3 s-meta" style="font-size: 0.8rem;">
                             <span style="color: var(--s-faint);">feito com Laravel + Debian</span>

@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AccessAuditController;
 use App\Http\Controllers\Admin\AiMemoryController;
 use App\Http\Controllers\Admin\AuditController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\GitHubViewController;
 use App\Http\Controllers\Admin\MonitorController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\ProjectController;
@@ -55,6 +56,25 @@ Route::prefix('admin')->name('admin.')
                 Route::get('/handoffs', 'handoffs')->name('handoffs');
                 Route::get('/handoffs/{hexId}', 'handoffShow')->name('handoffs.show');
                 Route::get('/busca', 'search')->name('search');
+            });
+
+        // GitHub View — dashboard de visualização animada de repositórios do GitHub
+        // (porte do github-visualize). Sync síncrono (sem queue:work). Ver
+        // .continue/migracao-github-visualize.md (§7).
+        Route::prefix('github-view')->name('github-view.')->controller(GitHubViewController::class)
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::post('/repos', 'store')->name('repos.store');
+                Route::post('/import', 'importAll')->name('import'); // importa todos os repos do usuário
+
+                Route::prefix('repos/{owner}/{name}')
+                    ->where(['owner' => '[\w.-]+', 'name' => '[\w.-]+'])
+                    ->group(function () {
+                        Route::get('/', 'show')->name('repos.show');
+                        Route::delete('/', 'destroy')->name('repos.destroy');
+                        Route::post('/sync', 'sync')->name('repos.sync');
+                        Route::get('/status', 'status')->name('repos.status');
+                    });
             });
 
         // Perfil / troca de senha

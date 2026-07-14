@@ -12,3 +12,8 @@ Artisan::command('inspire', function () {
 // (sobrevive a um reset do ai-memory). Ver app/Console/Commands/SnapshotAiMemoryStats.
 // Requer o cron do Laravel ativo no servidor: `* * * * * php artisan schedule:run`.
 Schedule::command('aimemory:snapshot')->dailyAt('03:10')->withoutOverlapping();
+
+// GitHub View — sincroniza os repositórios monitorados com o GitHub (incremental).
+// Ver app/Console/Commands/SyncGitHubRepositories. runInBackground: o backfill
+// inicial pode demorar e não deve segurar o schedule:run (que roda a cada minuto).
+Schedule::command('github-view:sync')->hourly()->withoutOverlapping()->runInBackground();
