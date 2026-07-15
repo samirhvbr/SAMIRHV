@@ -64,6 +64,7 @@ Route::prefix('admin')->name('admin.')
         Route::prefix('github-view')->name('github-view.')->controller(GitHubViewController::class)
             ->group(function () {
                 Route::get('/', 'index')->name('index');
+                Route::get('/suggestions', 'suggestions')->name('suggestions'); // autocomplete do add-form (JSON)
                 Route::post('/repos', 'store')->name('repos.store');
                 Route::post('/import', 'importAll')->name('import'); // importa todos os repos do usuário
 

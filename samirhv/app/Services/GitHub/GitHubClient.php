@@ -20,6 +20,13 @@ class GitHubClient
     private const REST_URL = 'https://api.github.com';
     private const PAGE_SIZE = 100;
 
+    /**
+     * Quais repos o /user/repos traz p/ o autocomplete: tudo que o token alcança
+     * — próprios, colaborações e organizações — pra descobrir repos de org (ex.:
+     * BLUE3-ISP), não só os pessoais. Espelha REPO_AFFILIATION do client.rb.
+     */
+    private const REPO_AFFILIATION = 'owner,collaborator,organization_member';
+
     /** Mesma query do Rails (HISTORY_QUERY). Nowdoc: NÃO interpolar ($ são vars GraphQL). */
     private const HISTORY_QUERY = <<<'GRAPHQL'
     query($owner: String!, $name: String!, $since: GitTimestamp, $cursor: String, $pageSize: Int!) {
@@ -157,7 +164,8 @@ class GitHubClient
     }
 
     /**
-     * Repos do usuário autenticado (p/ o autocomplete do add-form).
+     * Repos que o usuário autenticado alcança (próprios, colaborações e orgs —
+     * ver REPO_AFFILIATION), p/ o autocomplete do add-form. Mais recentes primeiro.
      *
      * @return array<int,array{full_name: ?string, description: ?string, private: bool}>
      */
@@ -170,7 +178,7 @@ class GitHubClient
             $body = $this->restGet('/user/repos', [
                 'per_page' => self::PAGE_SIZE,
                 'page' => $page,
-                'affiliation' => 'owner',
+                'affiliation' => self::REPO_AFFILIATION,
                 'sort' => 'pushed',
             ]);
             if ($body === []) {

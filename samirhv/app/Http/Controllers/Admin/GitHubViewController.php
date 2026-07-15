@@ -7,11 +7,13 @@ use App\Jobs\GitHubView\SyncRepositoryJob;
 use App\Models\GitHubView\Repository;
 use App\Services\GitHub\GitHubClient;
 use App\Services\GitHub\GitHubException;
+use App\Services\GitHub\RepositorySuggestions;
 use App\Services\GitHub\Visualizations\CommitHeatmap;
 use App\Services\GitHub\Visualizations\RepositoryOverview;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -100,6 +102,36 @@ class GitHubViewController extends Controller
 
         return redirect()->route('admin.github-view.index')->with('status',
             "Importados {$created} novo(s); {$skipped} já existiam. Sincronize cada um pra ver os gráficos.");
+    }
+
+    /**
+     * Autocomplete do add-form (JSON): repos que o token alcança (próprios +
+     * orgs + colaborações), menos os já monitorados, filtrados/ordenados por
+     * RepositorySuggestions. Cache de 10 min p/ não bater no GitHub a cada tecla.
+     * Porte de suggestions_controller.rb.
+     */
+    public function suggestions(Request $request): JsonResponse
+    {
+        try {
+            $repos = Cache::remember(
+                'github/user_repositories',
+                now()->addMinutes(10),
+                fn (): array => app(GitHubClient::class)->userRepositories(),
+            );
+        } catch (GitHubException $e) {
+            return response()->json([]);
+        }
+
+        $monitored = Repository::all(['owner', 'name'])->map->fullName();
+
+        $suggestions = (new RepositorySuggestions)->build(
+            $repos,
+            $request->string('q')->toString(),
+            $monitored->all(),
+            Repository::defaultOwner(),
+        );
+
+        return response()->json($suggestions);
     }
 
     /** Página do repositório com as visualizações (Fatia 1: heatmap). */

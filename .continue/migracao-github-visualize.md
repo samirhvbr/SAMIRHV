@@ -1,11 +1,12 @@
 # GitHub View — Migração Rails → Laravel (dentro do SAMIRHV)
 
-> **Status:** planejamento (só o plano; nada de código ainda).
+> **Status:** EM PRODUÇÃO (samirhv.com.br/admin › GitHub View) — Fatia 1 no ar,
+> fatias seguintes em andamento. Ver §15 (estado) e §16 (paridade contínua).
 > **Objetivo:** portar o `github-visualize` (Rails 8.1, do Fabio Akita) para uma
 > **feature nativa no `/admin`** do SAMIRHV — item de menu **"GitHub View"** —,
 > reaproveitando o máximo do original. **Não** rodar Rails ao lado.
 > **Origem:** fork em `github.com/samirhvbr/github-visualize` (upstream
-> `akitaonrails/github-visualize`). **Última atualização:** 12/07/2026.
+> `akitaonrails/github-visualize`). **Última atualização:** 15/07/2026.
 
 ---
 
@@ -264,9 +265,11 @@ já faz isso; sem Turbo/WebSocket.
 dashboard completo (autocomplete `/suggestions`) · sync status por polling.
 
 **Paridade com o upstream (Akita):**
-- Clone Rails de referência: `~/x/github-visualize` — remotes: `origin` = seu fork,
-  `upstream` = `akitaonrails/github-visualize`.
-- **Sincronizado até:** `b0e9f59` (HEAD do upstream em 12/07/2026).
+- Clone Rails de referência: `~/x/github-visualize`. ⚠️ Hoje o `origin` desse clone
+  aponta DIRETO pro `akitaonrails/github-visualize` (não pro fork). O fork
+  `samirhvbr/github-visualize` existe no GitHub — pra abrir PR, adicione-o como
+  remote e dê push da branch lá (passo a passo no §16).
+- **Sincronizado até:** `b0e9f59` (HEAD do upstream em 15/07/2026).
 - **Quando o Akita atualizar:**
   1. `git -C ~/x/github-visualize fetch upstream`
   2. `git log --oneline b0e9f59..upstream/master` → o que mudou (a *spec*).
@@ -275,3 +278,71 @@ dashboard completo (autocomplete `/suggestions`) · sync status por polling.
   4. Atualizar este marcador (`Sincronizado até: <novo sha>`).
 - **Não é** copiar arquivo direto (Rails/Ruby ≠ Laravel/PHP): o fork é radar de
   upstream + referência de diff, não fonte de código PHP.
+
+## 16. Paridade contínua — aplicar em AMBOS
+
+**Regra de ouro:** toda mudança de *comportamento* da GitHub View entra nos dois
+lados, com papéis distintos:
+
+| Artefato | Caminho | Stack | Papel |
+|---|---|---|---|
+| SAMIRHV (GitHub View) | `~/x/SAMIRHV/samirhv` | Laravel/PHP | **Produção** (samirhv.com.br/admin) — aplicar aqui primeiro |
+| Fork do Akita | `~/x/github-visualize` | Rails/Ruby | Referência + **PR upstream** — manter igual e propor ao Akita |
+
+**Idioma:** tudo do lado Rails/fork (código, comentários, mensagens de commit,
+corpo do PR) em **inglês** — padrão do Akita. O lado SAMIRHV e estes docs
+`.continue/` seguem em PT.
+
+**Fluxo p/ novidade NOSSA** (ex.: o fix de repos de org + busca):
+1. Implementar no **SAMIRHV** (Laravel) → conserta a produção.
+2. Espelhar a MESMA mudança no **fork Rails** (`~/x/github-visualize`) → vira PR
+   pro `akitaonrails/github-visualize` (contribuição limpa, 1 stack só).
+3. Registrar em "Mudanças nossas" abaixo.
+
+**Fluxo p/ novidade do Akita** (upstream): ver §15 (fetch upstream → diff →
+re-traduzir pro Laravel → bump do "Sincronizado até").
+
+**Abrir o PR do fix Rails** (o clone local não tem o fork como remote):
+```bash
+cd ~/x/github-visualize
+git remote add fork git@github.com:samirhvbr/github-visualize.git   # 1x
+git switch -c feat/org-repos-and-search
+git add -A && git commit                     # padrão de commit do repo
+git push -u fork feat/org-repos-and-search
+gh pr create --repo akitaonrails/github-visualize --base master
+```
+
+**Mapa de arquivos (peças que importam pra paridade):**
+
+| Rails (fork) | Laravel (SAMIRHV) |
+|---|---|
+| `app/services/github/client.rb` | `app/Services/GitHub/GitHubClient.php` |
+| `app/controllers/suggestions_controller.rb` | *(ainda não existe — autocomplete é fatia futura)* |
+| `app/controllers/repositories_controller.rb` | `app/Http/Controllers/Admin/GitHubViewController.php` |
+| `app/models/repository.rb` | `app/Models/GitHubView/Repository.php` |
+| `app/views/dashboard/*` | `resources/views/admin/github-view/*.blade.php` |
+| `app/javascript/controllers/*` | `public/js/admin/github-view/*.js` |
+
+**Divergências INTENCIONAIS (não são falhas de paridade):**
+- Sync **síncrono** (`dispatchSync`) no Laravel vs Solid Queue no Rails (§6/§15).
+- **"Importar todos"** (`importAll`) só no Laravel; o Rails usa o autocomplete
+  `/suggestions` (que o Laravel ainda não tem).
+- **MySQL** (`text`, `unsignedBigInteger`, collation CI) vs SQLite (§4.1).
+- `exclude_pull_requests=true` nos workflow runs (otimização do Laravel).
+- Auth do admin do SAMIRHV vs "sem auth" do original; CSS Canvas vs Tailwind 4.
+
+**Mudanças NOSSAS (manter espelhadas):**
+- **Repos de org + busca** (jul/2026): `affiliation=owner` →
+  `owner,collaborator,organization_member` (descobre repos de org tipo
+  BLUE3-ISP); busca por prefixo-de-owner/substring-de-nome; filtro nos cards.
+  - Rails: ✅ implementado (aguardando gate + PR).
+  - Laravel: ✅ implementado — affiliation ampla no `GitHubClient`, endpoint
+    `/admin/github-view/suggestions` + `RepositorySuggestions` (classe pura,
+    unit-tested), autocomplete no add-form + filtro client-side nos cards.
+    Feature test (DB+auth) fica pro CI com MySQL.
+
+**Compartilhar o port publicamente (DECISÃO EM ABERTO):** o repo do Akita **não
+tem licença** (all rights reserved) → o port é obra derivada. Antes de publicar:
+**pedir OK ao Akita** e **creditar** com destaque. Opções: repo separado
+`github-visualize-laravel` (crédito+link) · subfolder `laravel/` no repo dele (se
+ele quiser) · manter privado. Não subir port grande sem o aval.
