@@ -67,6 +67,27 @@
     .gh-badge--syncing{ color:var(--accent); border-color:var(--line-hover); background:var(--accent-soft); }
     .gh-badge--failed{ color:var(--danger); border-color:rgba(239,68,68,.3); background:rgba(239,68,68,.08); }
 
+    /* autocomplete do add-form */
+    .gh-ac{ position:relative; }
+    .gh-ac__list{ position:absolute; z-index:20; top:calc(100% + 4px); left:0; width:340px; max-width:80vw;
+        max-height:320px; overflow-y:auto; background:var(--panel); border:1px solid var(--line);
+        border-radius:var(--radius-sm); box-shadow:0 12px 28px rgba(0,0,0,.45); }
+    .gh-ac__item{ display:block; width:100%; text-align:left; background:none; border:0; cursor:pointer;
+        padding:8px 12px; font:inherit; }
+    .gh-ac__item:hover, .gh-ac__item.is-active{ background:var(--accent-soft); }
+    .gh-ac__name{ color:var(--txt); font-size:.85rem; }
+    .gh-ac__badge{ margin-left:8px; font-size:.62rem; color:var(--warn); border:1px solid var(--line);
+        border-radius:999px; padding:1px 6px; }
+    .gh-ac__desc{ display:block; color:var(--dim); font-size:.72rem; margin-top:2px;
+        overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+    /* filtro dos cards */
+    .gh-filterbar{ margin-top:14px; }
+    .gh-filter{ width:260px; max-width:52vw; background:var(--panel-2); border:1px solid var(--line);
+        color:var(--txt); border-radius:var(--radius-sm); padding:8px 12px; font:inherit; font-size:.85rem; }
+    .gh-filter:focus{ outline:none; border-color:var(--line-hover); }
+    .gh-filter::placeholder{ color:var(--dim); }
+
     .is-hidden{ display:none; }
     @media (max-width:640px){ .gh-top__actions{ align-items:stretch; } .gh-input{ max-width:none; flex:1; } }
     @media (prefers-reduced-motion:reduce){ .gh-bar__fill{ transition:none; } }
@@ -91,9 +112,12 @@
         <div class="gh-top__actions">
             <form method="POST" action="{{ route('admin.github-view.repos.store') }}" class="gh-add">
                 @csrf
-                <input type="text" name="repository" class="gh-input" autocomplete="off" spellcheck="false" required
-                    value="{{ old('repository') }}"
-                    placeholder="{{ $defaultOwner ? $defaultOwner.'/repo · ou só repo' : 'owner/repo' }}">
+                <div class="gh-ac" data-gh-autocomplete data-url="{{ route('admin.github-view.suggestions') }}">
+                    <input type="text" name="repository" class="gh-input" autocomplete="off" spellcheck="false" required
+                        value="{{ old('repository') }}" data-gh-autocomplete-input
+                        placeholder="{{ $defaultOwner ? $defaultOwner.'/repo · ou só repo' : 'owner/repo' }}">
+                    <div class="gh-ac__list is-hidden" data-gh-autocomplete-list></div>
+                </div>
                 <button type="submit" class="gh-btn"><i class="fa-solid fa-plus"></i> add + sync</button>
             </form>
             <form method="POST" action="{{ route('admin.github-view.import') }}"
@@ -146,11 +170,22 @@
             @endforeach
         </div>
 
-        <section class="gh-grid">
-            @foreach($repositories as $repo)
-                @include('admin.github-view._card', ['repo' => $repo, 'stats' => $overview->for($repo), 'chipDays' => $chipDays])
-            @endforeach
-        </section>
+        <div data-gh-filter>
+            <div class="gh-filterbar">
+                <input type="search" class="gh-filter" placeholder="filtrar repos…" autocomplete="off"
+                       aria-label="filtrar repositórios" data-gh-filter-input>
+            </div>
+
+            <section class="gh-grid">
+                @foreach($repositories as $repo)
+                    <div data-gh-filter-item data-repo-name="{{ strtolower($repo->fullName()) }}">
+                        @include('admin.github-view._card', ['repo' => $repo, 'stats' => $overview->for($repo), 'chipDays' => $chipDays])
+                    </div>
+                @endforeach
+            </section>
+
+            <p class="gh-empty is-hidden" data-gh-filter-empty>Nenhum repositório corresponde ao filtro.</p>
+        </div>
     @endif
 @endsection
 
