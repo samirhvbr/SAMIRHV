@@ -106,6 +106,24 @@ O `memory.sqlite` é um índice **derivado** — pode ser recriado/zerado. Para 
   retrato mais antigo dentro da janela, e a UI mostra **quantos dias** esse
   intervalo teve de fato — se faltarem retratos, o rótulo acompanha.
 
+### "Ao vivo" (Dashboard)
+
+O `memory.sqlite` é escrito pelos **agentes**, não por este app — não existe evento
+nosso para transmitir, então não há o que ganhar com WebSocket/broadcast (seria um
+daemon a mais no servidor para, no fim, também ficar consultando o arquivo).
+
+O Dashboard resolve isso com **polling curto do navegador**: `dashboard.js` chama
+`GET /admin/ai-memory/live` (mesma sessão/middleware do painel) a cada 15s e troca
+**só os valores** — números, alturas das barras, teto do eixo e a tabela
+equivalente. Nada é recriado no DOM, então não pisca nem pula. Detalhes:
+
+- **aba escondida não consulta** (`visibilitychange`); ao voltar, atualiza na hora;
+- **pausável** pelo botão "ao vivo" (fica em `localStorage`);
+- **erro seguido espaça as tentativas** (backoff até 2 min) e o ponto fica vermelho;
+- durante a busca, o desenho anterior fica de pé com opacidade menor — sem esqueleto.
+
+Para mudar o intervalo: `data-every` (segundos) no elemento `[data-aim-live]`.
+
 ## 6. Mapa de código
 
 | Camada | Arquivo |
@@ -114,6 +132,8 @@ O `memory.sqlite` é um índice **derivado** — pode ser recriado/zerado. Para 
 | Formatação de tempo (µs → local) | `app/Services/AiMemory/AiMemoryTime.php` |
 | Consultas (1 por tela) | `app/Services/AiMemory/{Stats,Project,Page,Session,Observation,Handoff,Search}Repository.php` |
 | Números derivados do Dashboard (sem banco) | `app/Services/AiMemory/DashboardSummary.php` |
+| JSON do "ao vivo" do Dashboard | `AiMemoryController::live()` → rota `admin.ai-memory.live` |
+| Sistema visual do módulo (CSS, `@once`) | `resources/views/admin/ai-memory/_styles.blade.php` |
 | Controller fino | `app/Http/Controllers/Admin/AiMemoryController.php` |
 | Rotas | `routes/admin.php` (grupo `admin.ai-memory.*`) |
 | Views | `resources/views/admin/ai-memory/*.blade.php` |

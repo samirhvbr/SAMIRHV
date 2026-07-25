@@ -1,10 +1,11 @@
 /**
- * AI-MEMORY · Dashboard — camada de leitura dos gráficos.
+ * AI-MEMORY · Dashboard — leitura dos gráficos + atualização ao vivo.
  *
  * Os gráficos já vêm desenhados do servidor (funcionam sem JS); este arquivo
- * só acrescenta a leitura fina: crosshair + tooltip, navegação por teclado,
- * tabela equivalente e troca de métrica no histórico. Nada aqui é a ÚNICA
- * forma de ler um valor — o botão "tabela" e os rótulos cobrem tudo.
+ * acrescenta a leitura fina (crosshair + tooltip, teclado, tabela equivalente,
+ * troca de métrica) e o "ao vivo": um polling curto em /admin/ai-memory/live
+ * que troca números e barras no lugar, sem recarregar a página. Nada aqui é a
+ * ÚNICA forma de ler um valor — o botão "tabela" e os rótulos cobrem tudo.
  */
 (() => {
     'use strict';
@@ -39,12 +40,22 @@
         return head;
     };
 
+    /** Teto "redondo" do eixo Y — espelha DashboardSummary::niceMax() no PHP. */
+    const niceMax = (max) => {
+        if (max <= 5) return Math.max(max, 1);
+        const step = Math.max(1, 10 ** Math.floor(Math.log10(max)) / 2);
+        return Math.ceil(max / step) * step;
+    };
+
     /** Posiciona o tooltip ao lado do ponto, virando para dentro do card. */
     const placeTip = (tip, x, y, width) => {
         const left = x + 14 + tip.offsetWidth > width ? x - tip.offsetWidth - 14 : x + 14;
         tip.style.left = Math.max(0, left) + 'px';
         tip.style.top = Math.max(0, y) + 'px';
     };
+
+    // Preenchido pelo bloco da Atividade; usado pelo "ao vivo" para redesenhar.
+    let refreshSeries = null;
 
     // ── Atividade: duas faixas, um eixo, um tooltip ──────────────────────────
     const plot = document.querySelector('[data-aim-plot]');
@@ -119,6 +130,65 @@
                 toggle.setAttribute('aria-expanded', String(opening));
             });
         }
+
+        /**
+         * Redesenha as duas faixas com uma série nova (mesmos dias) — barras,
+         * teto do eixo, números da legenda e a tabela equivalente. Só mexe no que
+         * mudou de valor: nenhum nó é recriado, então nada pisca nem pula.
+         */
+        refreshSeries = (nextDays, nextObs, nextSes) => {
+            const series = [
+                { key: 'obs', values: nextObs, cols: cols[0], store: obs },
+                { key: 'ses', values: nextSes, cols: cols[1], store: ses },
+            ];
+
+            days.length = 0;
+            days.push(...nextDays);
+
+            series.forEach(({ key, values, cols: list, store }) => {
+                if (!list || !values.length) return;
+                store.length = 0;
+                store.push(...values);
+
+                const max = Math.max(...values, 0);
+                const top = niceMax(max);
+                const totals = values.reduce((a, b) => a + b, 0);
+
+                list.forEach((col, i) => {
+                    const bar = col.querySelector('.aim-colbar');
+                    if (!bar) return;
+                    const value = values[i] ?? 0;
+                    bar.classList.toggle('aim-colbar--zero', value === 0);
+                    bar.classList.toggle('aim-colbar--peak', value > 0 && value === max);
+                    bar.style.height = value > 0 ? (value / top) * 100 + '%' : '';
+                });
+
+                const peakIndex = values.lastIndexOf(max);
+                const set = (name, text) => {
+                    const el = document.querySelector(`[data-live="${key}.${name}"]`);
+                    if (el && el.textContent !== text) el.textContent = text;
+                };
+                set('top', fmt.format(top));
+                set('total', fmt.format(totals));
+                set('avg', fmt.format(Math.round(totals / Math.max(values.length, 1))));
+                set('max', fmt.format(max));
+                if (max > 0 && nextDays[peakIndex]) set('peak', nextDays[peakIndex]);
+            });
+
+            // tabela equivalente (mais recente primeiro), célula a célula
+            const rowsEl = table ? [...table.querySelectorAll('tbody tr')] : [];
+            rowsEl.forEach((tr, i) => {
+                const idx = nextDays.length - 1 - i;
+                if (idx < 0) return;
+                const cells = tr.cells;
+                const values = [nextDays[idx], fmt.format(nextObs[idx] ?? 0), fmt.format(nextSes[idx] ?? 0)];
+                values.forEach((text, c) => {
+                    if (cells[c] && cells[c].textContent !== text) cells[c].textContent = text;
+                });
+            });
+
+            if (current >= 0 && plot.classList.contains('is-hovering')) show(current);
+        };
     }
 
     // ── Histórico: troca de métrica + leitura por data ───────────────────────
@@ -141,13 +211,6 @@
         let metric = 'observations';
         let top = 1;
         let current = -1;
-
-        // mesmo teto "redondo" do PHP (DashboardSummary::niceMax)
-        const niceMax = (max) => {
-            if (max <= 5) return Math.max(max, 1);
-            const step = Math.max(1, 10 ** Math.floor(Math.log10(max)) / 2);
-            return Math.ceil(max / step) * step;
-        };
 
         const render = () => {
             const values = series[metric] || [];
@@ -222,5 +285,143 @@
         });
 
         render();
+    }
+
+    // ── "Ao vivo": polling curto, pausável, que troca os números no lugar ────
+    const live = document.querySelector('[data-aim-live]');
+    if (live) {
+        const url = live.dataset.url;
+        const every = Math.max(5, Number(live.dataset.every) || 15) * 1000;
+        const btn = live.querySelector('[data-aim-livetoggle]');
+        const label = live.querySelector('[data-aim-livelabel]');
+        const when = live.querySelector('[data-aim-livewhen]');
+        const root = document.querySelector('.aim');
+        const KEY = 'aim.live.paused';
+
+        let paused = localStorage.getItem(KEY) === '1';
+        let lastAt = null;
+        let failures = 0;
+        let timer = null;
+        let inFlight = null;
+
+        const setState = (state) => live.setAttribute('data-state', state);
+
+        /** "agora mesmo" / "há 12s" / "há 3min" — sem depender de biblioteca. */
+        const ago = () => {
+            if (!lastAt) return '';
+            const s = Math.round((Date.now() - lastAt) / 1000);
+            if (s < 5) return 'agora mesmo';
+            if (s < 60) return `há ${s}s`;
+            const m = Math.round(s / 60);
+            return m < 60 ? `há ${m}min` : `há ${Math.round(m / 60)}h`;
+        };
+
+        const paint = () => {
+            if (paused) {
+                when.textContent = lastAt ? `pausado · ${ago()}` : 'pausado';
+            } else if (failures > 0) {
+                when.textContent = 'sem resposta do servidor';
+            } else {
+                when.textContent = ago();
+            }
+        };
+
+        const apply = (data) => {
+            if (!data || data.available === false) {
+                setState('error');
+                return;
+            }
+
+            // totais
+            Object.entries(data.counts || {}).forEach(([key, value]) => {
+                const el = document.querySelector(`[data-live="counts.${key}"]`);
+                const text = fmt.format(value);
+                if (el && el.textContent !== text) el.textContent = text;
+            });
+
+            // variação vs. o retrato de referência (que não muda no meio do dia)
+            document.querySelectorAll('[data-live-delta]').forEach((el) => {
+                const key = el.dataset.liveDelta;
+                const ref = Number(el.dataset.ref);
+                const now = Number((data.counts || {})[key]);
+                if (!Number.isFinite(ref) || !Number.isFinite(now)) return;
+                const diff = now - ref;
+                const value = el.querySelector('b');
+                if (value) value.textContent = (diff > 0 ? '+' : '') + fmt.format(diff);
+                const arrow = el.querySelector('i');
+                if (arrow) arrow.textContent = diff > 0 ? '▲' : diff < 0 ? '▼' : '•';
+                el.classList.toggle('aim-delta--up', diff > 0);
+                el.classList.toggle('aim-delta--down', diff < 0);
+                el.classList.toggle('aim-delta--flat', diff === 0);
+            });
+
+            const obsByDay = data.observationsByDay || {};
+            const sesByDay = data.sessionsByDay || {};
+            const keys = Object.keys(obsByDay);
+            if (keys.length) {
+                const today = document.querySelector('[data-live="obs.today"]');
+                if (today) today.textContent = fmt.format(obsByDay[keys[keys.length - 1]] ?? 0);
+
+                if (refreshSeries) {
+                    // dd/mm, o mesmo formato do eixo desenhado pelo servidor
+                    const labels = keys.map((iso) => iso.slice(8, 10) + '/' + iso.slice(5, 7));
+                    refreshSeries(labels, Object.values(obsByDay), keys.map((k) => sesByDay[k] ?? 0));
+                }
+            }
+
+            lastAt = Date.now();
+            failures = 0;
+            setState('live');
+        };
+
+        const tick = async () => {
+            if (paused || document.hidden || inFlight) return;
+            root?.classList.add('aim-refetching');
+            try {
+                inFlight = fetch(url, { headers: { Accept: 'application/json' }, credentials: 'same-origin' });
+                const response = await inFlight;
+                if (!response.ok) throw new Error(String(response.status));
+                apply(await response.json());
+            } catch {
+                failures += 1;
+                setState('error');
+            } finally {
+                inFlight = null;
+                root?.classList.remove('aim-refetching');
+                paint();
+            }
+        };
+
+        const schedule = () => {
+            clearTimeout(timer);
+            if (paused) return;
+            // erro seguido espaça as tentativas (até 2 min) em vez de martelar
+            const delay = failures > 0 ? Math.min(every * 2 ** failures, 120000) : every;
+            timer = setTimeout(async () => {
+                await tick();
+                schedule();
+            }, delay);
+        };
+
+        const setPaused = (value) => {
+            paused = value;
+            localStorage.setItem(KEY, value ? '1' : '0');
+            btn.setAttribute('aria-pressed', String(!value));
+            label.textContent = value ? 'pausado' : 'ao vivo';
+            setState(value ? 'paused' : 'live');
+            paint();
+            schedule();
+            if (!value) tick();
+        };
+
+        btn.addEventListener('click', () => setPaused(!paused));
+
+        // aba escondida não consome requisição; ao voltar, atualiza na hora
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && !paused) tick();
+        });
+
+        setInterval(paint, 5000);   // só o rótulo "há Xs"
+        setPaused(paused);
     }
 })();

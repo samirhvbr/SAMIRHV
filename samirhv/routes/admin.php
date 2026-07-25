@@ -45,6 +45,7 @@ Route::prefix('admin')->name('admin.')
             ->where(['hexId' => '[0-9a-fA-F]{32}'])
             ->group(function () {
                 Route::get('/', 'dashboard')->name('dashboard');
+                Route::get('/live', 'live')->name('live');   // JSON do "ao vivo" do Dashboard
                 Route::get('/projetos', 'projects')->name('projects');
                 Route::get('/projetos/{hexId}', 'projectShow')->name('projects.show');
                 Route::get('/paginas', 'pages')->name('pages');

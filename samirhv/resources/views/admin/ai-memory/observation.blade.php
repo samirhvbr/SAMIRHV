@@ -7,6 +7,7 @@
 @endsection
 
 @section('content')
+<div class="aim">
     @include('admin.ai-memory._tabs')
 
     @unless($available)
@@ -14,27 +15,54 @@
     @else
         @php
             $T = \App\Services\AiMemory\AiMemoryTime::class;
-            $impBadge = $observation->importance >= 8 ? 'badge-danger' : ($observation->importance >= 5 ? 'badge-warn' : 'badge-muted');
+            $imp = (int) $observation->importance;
+            $impClass = $imp >= 8 ? 'aim-imp--high' : ($imp >= 5 ? 'aim-imp--mid' : '');
         @endphp
 
-        <div class="admin-card">
-            <h2 style="margin-bottom:10px">{{ $observation->title }}</h2>
-            <div style="margin-bottom:18px">
-                <span class="badge badge-muted">{{ $observation->kind }}</span>
-                <span class="badge {{ $impBadge }}">importância {{ $observation->importance }}</span>
-                @if($observation->agent_kind)<span class="badge badge-accent">{{ $observation->agent_kind }}</span>@endif
+        <header class="aim-hero">
+            <div>
+                <h1>{{ $observation->title }}</h1>
+                <div class="aim-hero__chips">
+                    <span class="aim-chip">{{ $observation->kind }}</span>
+                    @if($observation->agent_kind)<span class="aim-chip aim-chip--accent">{{ $observation->agent_kind }}</span>@endif
+                    <span class="aim-imp {{ $impClass }}" title="Importância {{ $imp }} de 10">
+                        <span class="aim-imp__track"><span class="aim-imp__fill" style="width:{{ min(100, $imp * 10) }}%"></span></span>
+                        <span class="aim-imp__n">importância {{ $imp }}/10</span>
+                    </span>
+                </div>
             </div>
+        </header>
 
-            <ul class="an-list" style="max-width:640px;margin-bottom:18px">
-                <li><span class="card-sub">Projeto</span><span>{{ $observation->project }}</span></li>
-                <li><span class="card-sub">Data</span><span>{{ $T::format($observation->created_at) }}</span></li>
-                @if($observation->session_hex)
-                    <li><span class="card-sub">Sessão</span><span><a href="{{ route('admin.ai-memory.sessions.show', $observation->session_hex) }}">abrir sessão</a></span></li>
-                @endif
-            </ul>
+        <dl class="aim-facts aim-facts--cols" style="margin-bottom:22px">
+            <div><dt>Projeto</dt><dd>{{ $observation->project }}</dd></div>
+            <div><dt>Registrada</dt><dd class="aim-mono">{{ $T::format($observation->created_at) }}</dd></div>
+            <div>
+                <dt>Sessão</dt>
+                <dd>
+                    @if($observation->session_hex)
+                        <a href="{{ route('admin.ai-memory.sessions.show', $observation->session_hex) }}">abrir a sessão ↗</a>
+                    @else
+                        <span class="aim-mono">—</span>
+                    @endif
+                </dd>
+            </div>
+            <div><dt>Tipo</dt><dd class="aim-mono">{{ $observation->kind }}</dd></div>
+        </dl>
 
-            <p class="card-sub" style="margin-bottom:6px">Corpo</p>
-            <div style="white-space:pre-wrap;line-height:1.6;color:#dbe2ea;background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:14px 16px">{{ $observation->body }}</div>
-        </div>
+        <section class="admin-card aim-card">
+            <header class="aim-card__head">
+                <div>
+                    <h2>Fato registrado</h2>
+                    <p class="aim-sub">texto como o agente gravou</p>
+                </div>
+            </header>
+
+            @if(trim((string) $observation->body) === '')
+                <p class="aim-empty">Esta observação não tem corpo — só o título acima.</p>
+            @else
+                <p class="aim-raw">{{ $observation->body }}</p>
+            @endif
+        </section>
     @endunless
+</div>
 @endsection

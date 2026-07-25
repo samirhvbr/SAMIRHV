@@ -1,5 +1,7 @@
 {{-- Sub-navegação do módulo AI-MEMORY. Usada por TODAS as abas — o estilo vem
      junto (uma vez só) para o módulo ter o mesmo vocabulário em toda tela. --}}
+@include('admin.ai-memory._styles')
+
 @once
 @push('styles')
 <style>

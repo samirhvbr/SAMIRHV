@@ -3,6 +3,7 @@
 @section('title', 'AI-MEMORY · Observações')
 
 @section('content')
+<div class="aim">
     @include('admin.ai-memory._tabs')
 
     @unless($available)
@@ -10,16 +11,23 @@
     @else
         @php
             $T = \App\Services\AiMemory\AiMemoryTime::class;
-            $impBadge = fn ($i) => $i >= 8 ? 'badge-danger' : ($i >= 5 ? 'badge-warn' : 'badge-muted');
+            // Importância é uma escala 0–10: medidor lê melhor que um número solto.
+            $impClass = fn ($i) => $i >= 8 ? 'aim-imp--high' : ($i >= 5 ? 'aim-imp--mid' : '');
+            $hasFilters = ! empty(array_filter($filters, fn ($v) => $v !== null && $v !== ''));
         @endphp
 
-        <div class="admin-card">
-            <h2>Observações <span class="card-sub">— {{ $observations->total() }}</span></h2>
+        <section class="admin-card aim-card">
+            <header class="aim-card__head">
+                <div>
+                    <h2>Observações</h2>
+                    <p class="aim-sub">{{ number_format($observations->total(), 0, ',', '.') }} fatos aprendidos · mais recentes primeiro</p>
+                </div>
+            </header>
 
-            <form method="GET" action="{{ route('admin.ai-memory.observations') }}" class="filters">
+            <form method="GET" action="{{ route('admin.ai-memory.observations') }}" class="aim-filters">
                 <div class="form-row">
-                    <label>Tipo</label>
-                    <select name="kind">
+                    <label for="f-kind">Tipo</label>
+                    <select name="kind" id="f-kind">
                         <option value="">Todos</option>
                         @foreach($kinds as $k)
                             <option value="{{ $k }}" @selected(($filters['kind'] ?? null) === $k)>{{ $k }}</option>
@@ -27,8 +35,8 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Importância mín.</label>
-                    <select name="importance">
+                    <label for="f-imp">Importância mín.</label>
+                    <select name="importance" id="f-imp">
                         <option value="">Qualquer</option>
                         @foreach([3 => '≥ 3', 5 => '≥ 5', 8 => '≥ 8'] as $v => $lbl)
                             <option value="{{ $v }}" @selected((int) ($filters['importance'] ?? 0) === $v)>{{ $lbl }}</option>
@@ -36,8 +44,8 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Projeto</label>
-                    <select name="project">
+                    <label for="f-project">Projeto</label>
+                    <select name="project" id="f-project">
                         <option value="">Todos</option>
                         @foreach($projectOptions as $opt)
                             <option value="{{ $opt->id_hex }}" @selected(($filters['project'] ?? null) === $opt->id_hex)>{{ $opt->name }}</option>
@@ -45,41 +53,65 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Período</label>
-                    <select name="days">
+                    <label for="f-days">Período</label>
+                    <select name="days" id="f-days">
                         <option value="">Tudo</option>
                         @foreach([1 => 'Hoje', 7 => '7 dias', 30 => '30 dias', 90 => '90 dias'] as $v => $lbl)
                             <option value="{{ $v }}" @selected((int) ($filters['days'] ?? 0) === $v)>{{ $lbl }}</option>
                         @endforeach
                     </select>
                 </div>
-                <button type="submit" class="admin-btn admin-btn-primary">Filtrar</button>
-                <a href="{{ route('admin.ai-memory.observations') }}" class="admin-btn">Limpar</a>
+                <div class="aim-filters__go">
+                    <button type="submit" class="admin-btn admin-btn-primary">Filtrar</button>
+                    @if($hasFilters)<a href="{{ route('admin.ai-memory.observations') }}" class="admin-btn">Limpar</a>@endif
+                </div>
             </form>
 
-            <div style="overflow-x:auto">
-                <table class="admin-table">
-                    <thead>
-                        <tr><th>Tipo</th><th>Título</th><th>Imp.</th><th>Projeto</th><th>Sessão</th><th>Data</th></tr>
-                    </thead>
-                    <tbody>
-                        @forelse($observations as $o)
+            @if($observations->isEmpty())
+                <div class="aim-blank">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    <p>{{ $hasFilters ? 'Nenhuma observação para este filtro.' : 'Nenhuma observação registrada ainda.' }}</p>
+                    <p>{{ $hasFilters ? 'Baixe a importância mínima ou amplie o período.' : 'Cada observação é um fato que um agente aprendeu durante uma sessão.' }}</p>
+                </div>
+            @else
+                <div class="aim-scroll">
+                    <table class="admin-table">
+                        <thead>
                             <tr>
-                                <td><span class="badge badge-muted">{{ $o->kind }}</span></td>
-                                <td><a href="{{ route('admin.ai-memory.observations.show', $o->id_hex) }}">{{ \Illuminate\Support\Str::limit($o->title, 80) }}</a></td>
-                                <td><span class="badge {{ $impBadge($o->importance) }}">{{ $o->importance }}</span></td>
-                                <td class="muted">{{ $o->project }}</td>
-                                <td>@if($o->session_hex)<a href="{{ route('admin.ai-memory.sessions.show', $o->session_hex) }}" class="muted"><i class="fa-solid fa-arrow-up-right-from-square" style="font-size:.7rem"></i></a>@else <span class="muted">—</span>@endif</td>
-                                <td class="muted" style="white-space:nowrap">{{ $T::format($o->created_at, 'd/m/Y H:i') }}</td>
+                                <th scope="col">Tipo</th>
+                                <th scope="col">Título</th>
+                                <th scope="col">Importância</th>
+                                <th scope="col">Projeto</th>
+                                <th scope="col">Quando</th>
                             </tr>
-                        @empty
-                            <tr><td colspan="6" class="muted" style="text-align:center;padding:36px">Nenhuma observação para o filtro.</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            @foreach($observations as $o)
+                                <tr>
+                                    <td><span class="aim-chip">{{ $o->kind }}</span></td>
+                                    <td>
+                                        <a href="{{ route('admin.ai-memory.observations.show', $o->id_hex) }}" class="aim-strong">{{ \Illuminate\Support\Str::limit($o->title, 90) }}</a>
+                                        @if($o->session_hex)
+                                            <div><a href="{{ route('admin.ai-memory.sessions.show', $o->session_hex) }}" class="aim-mono" title="Abrir a sessão que gerou esta observação">na sessão ↗</a></div>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="aim-imp {{ $impClass($o->importance) }}" title="Importância {{ $o->importance }} de 10">
+                                            <span class="aim-imp__track"><span class="aim-imp__fill" style="width:{{ min(100, (int) $o->importance * 10) }}%"></span></span>
+                                            <span class="aim-imp__n">{{ $o->importance }}</span>
+                                        </span>
+                                    </td>
+                                    <td class="aim-mono">{{ $o->project }}</td>
+                                    <td class="aim-when" title="{{ $T::format($o->created_at) }}">{{ $T::human($o->created_at) }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
 
-            <div class="pagination">{{ $observations->links() }}</div>
-        </div>
+                {{ $observations->links() }}
+            @endif
+        </section>
     @endunless
+</div>
 @endsection
