@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AiMemoryStatSnapshot;
 use App\Services\AiMemory\AiMemoryDatabase;
+use App\Services\AiMemory\DashboardSummary;
 use App\Services\AiMemory\HandoffRepository;
 use App\Services\AiMemory\ObservationRepository;
 use App\Services\AiMemory\PageRepository;
@@ -28,7 +29,7 @@ class AiMemoryController extends Controller
 {
     public function __construct(private readonly AiMemoryDatabase $db) {}
 
-    public function dashboard(StatsRepository $stats): View
+    public function dashboard(StatsRepository $stats, ProjectRepository $projects, DashboardSummary $summary): View
     {
         $days = (int) config('aimemory.chart_days', 30);
 
@@ -38,6 +39,13 @@ class AiMemoryController extends Controller
             'sessionsByDay' => $stats->sessionsByDay($days),
             // Evolução de longo prazo vem da tabela DURÁVEL (sobrevive a reset).
             'history' => AiMemoryStatSnapshot::orderBy('captured_on')->get(),
+            // Ranking: os mesmos projetos da aba "Projetos", ordenados por volume.
+            'topProjects' => collect($projects->all())
+                ->sortByDesc(fn ($project) => (int) $project->observations)
+                ->take(6)
+                ->values(),
+            // Contas/escalas dos gráficos (matemática de apresentação, sem banco).
+            'summary' => $summary,
         ]);
     }
 

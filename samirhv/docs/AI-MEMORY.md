@@ -101,6 +101,10 @@ O `memory.sqlite` é um índice **derivado** — pode ser recriado/zerado. Para 
   Requer o cron do Laravel no servidor: `* * * * * php artisan schedule:run`.
 - O Dashboard mostra os totais **ao vivo** (do ai-memory) e a **evolução
   histórica** (desta tabela, que sobrevive a reset).
+- Os retratos também alimentam, no Dashboard, os *sparklines* dos totais e a
+  variação ("+N em X dias"): a variação compara o número **vivo** de agora com o
+  retrato mais antigo dentro da janela, e a UI mostra **quantos dias** esse
+  intervalo teve de fato — se faltarem retratos, o rótulo acompanha.
 
 ## 6. Mapa de código
 
@@ -109,9 +113,12 @@ O `memory.sqlite` é um índice **derivado** — pode ser recriado/zerado. Para 
 | Conexão RO + `isAvailable` + paginação | `app/Services/AiMemory/AiMemoryDatabase.php` |
 | Formatação de tempo (µs → local) | `app/Services/AiMemory/AiMemoryTime.php` |
 | Consultas (1 por tela) | `app/Services/AiMemory/{Stats,Project,Page,Session,Observation,Handoff,Search}Repository.php` |
+| Números derivados do Dashboard (sem banco) | `app/Services/AiMemory/DashboardSummary.php` |
 | Controller fino | `app/Http/Controllers/Admin/AiMemoryController.php` |
 | Rotas | `routes/admin.php` (grupo `admin.ai-memory.*`) |
 | Views | `resources/views/admin/ai-memory/*.blade.php` |
+| Sub-navegação do módulo (+ CSS, `@once`) | `resources/views/admin/ai-memory/_tabs.blade.php` |
+| Leitura dos gráficos (crosshair/tooltip/teclado) | `public/js/admin/ai-memory/dashboard.js` |
 | Aviso de degradação | `resources/views/admin/ai-memory/_unavailable.blade.php` |
 | Config | `config/aimemory.php`, conexão `aimemory` em `config/database.php` |
 | Histórico | migration `..._create_ai_memory_stat_snapshots_table`, `App\Models\AiMemoryStatSnapshot`, `app/Console/Commands/SnapshotAiMemoryStats.php` |
