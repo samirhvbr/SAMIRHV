@@ -9,6 +9,7 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
@@ -32,6 +33,22 @@ class AppServiceProvider extends ServiceProvider
         $this->registerAuthEventListeners();
         $this->shareNavProjects();
         $this->shareAppVersion();
+        $this->useAdminPagination();
+    }
+
+    /**
+     * Paginação do painel em pt-BR, com os tokens do admin.
+     *
+     * O padrão do Laravel é `pagination::tailwind` — classes utilitárias e SVGs
+     * dimensionados por Tailwind. Este projeto NÃO carrega Tailwind (o tema é o
+     * Canvas + CSS próprio), então o `<svg class="w-5 h-5">` das setas ficava sem
+     * tamanho e era desenhado do tamanho do container. Ver
+     * resources/views/vendor/pagination/admin.blade.php.
+     */
+    private function useAdminPagination(): void
+    {
+        Paginator::defaultView('vendor.pagination.admin');
+        Paginator::defaultSimpleView('vendor.pagination.admin-simple');
     }
 
     /**

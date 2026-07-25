@@ -13,6 +13,7 @@ use App\Services\AiMemory\ProjectRepository;
 use App\Services\AiMemory\SearchRepository;
 use App\Services\AiMemory\SessionRepository;
 use App\Services\AiMemory\StatsRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -46,6 +47,30 @@ class AiMemoryController extends Controller
                 ->values(),
             // Contas/escalas dos gráficos (matemática de apresentação, sem banco).
             'summary' => $summary,
+        ]);
+    }
+
+    /**
+     * Endpoint do "ao vivo" do Dashboard: os mesmos números da tela, em JSON.
+     *
+     * O ai-memory é escrito por OUTROS processos (os agentes), não por este app —
+     * não existe evento nosso para transmitir. Então "tempo real" aqui é polling
+     * curto do navegador, que não exige daemon nenhum no servidor (nada de
+     * WebSocket/Reverb para manter). O JS só troca os números e as barras.
+     */
+    public function live(StatsRepository $stats): JsonResponse
+    {
+        if (! $this->db->isAvailable()) {
+            return response()->json(['available' => false]);
+        }
+
+        $days = (int) config('aimemory.chart_days', 30);
+
+        return response()->json([
+            'available' => true,
+            'counts' => $stats->counts(),
+            'observationsByDay' => $stats->observationsByDay($days),
+            'sessionsByDay' => $stats->sessionsByDay($days),
         ]);
     }
 

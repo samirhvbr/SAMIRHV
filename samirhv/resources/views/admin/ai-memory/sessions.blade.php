@@ -3,6 +3,7 @@
 @section('title', 'AI-MEMORY · Sessões')
 
 @section('content')
+<div class="aim">
     @include('admin.ai-memory._tabs')
 
     @unless($available)
@@ -13,19 +14,26 @@
             $sort = $filters['sort'] ?? 'recent';
             // Links de ordenação preservam os filtros atuais e voltam pra página 1.
             $sortUrl = fn ($s) => route('admin.ai-memory.sessions', array_merge(\Illuminate\Support\Arr::except(request()->query(), 'page'), ['sort' => $s]));
-            $inicioNext = $sort === 'oldest' ? 'recent' : 'oldest';
-            $inicioArrow = $sort === 'recent' ? ' ▼' : ($sort === 'oldest' ? ' ▲' : '');
+            $startNext = $sort === 'oldest' ? 'recent' : 'oldest';
+            $startArrow = $sort === 'recent' ? '▼' : ($sort === 'oldest' ? '▲' : '');
             $durNext = $sort === 'longest' ? 'shortest' : 'longest';
-            $durArrow = $sort === 'longest' ? ' ▼' : ($sort === 'shortest' ? ' ▲' : '');
+            $durArrow = $sort === 'longest' ? '▼' : ($sort === 'shortest' ? '▲' : '');
+            $hasFilters = ! empty(array_filter($filters, fn ($v, $k) => $k !== 'sort' && $v !== null && $v !== '', ARRAY_FILTER_USE_BOTH));
+            $maxObs = max(1, (int) collect($sessions->items())->max('obs_count'));
         @endphp
 
-        <div class="admin-card">
-            <h2>Sessões <span class="card-sub">— {{ $sessions->total() }}</span></h2>
+        <section class="admin-card aim-card">
+            <header class="aim-card__head">
+                <div>
+                    <h2>Sessões</h2>
+                    <p class="aim-sub">{{ number_format($sessions->total(), 0, ',', '.') }} no total · cada sessão é um agente trabalhando</p>
+                </div>
+            </header>
 
-            <form method="GET" action="{{ route('admin.ai-memory.sessions') }}" class="filters">
+            <form method="GET" action="{{ route('admin.ai-memory.sessions') }}" class="aim-filters">
                 <div class="form-row">
-                    <label>Agente</label>
-                    <select name="agent">
+                    <label for="f-agent">Agente</label>
+                    <select name="agent" id="f-agent">
                         <option value="">Todos</option>
                         @foreach($agentKinds as $ak)
                             <option value="{{ $ak }}" @selected(($filters['agent'] ?? null) === $ak)>{{ $ak }}</option>
@@ -33,8 +41,8 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Projeto</label>
-                    <select name="project">
+                    <label for="f-project">Projeto</label>
+                    <select name="project" id="f-project">
                         <option value="">Todos</option>
                         @foreach($projectOptions as $opt)
                             <option value="{{ $opt->id_hex }}" @selected(($filters['project'] ?? null) === $opt->id_hex)>{{ $opt->name }}</option>
@@ -42,8 +50,8 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <label>Início (período)</label>
-                    <select name="days">
+                    <label for="f-days">Início</label>
+                    <select name="days" id="f-days">
                         <option value="">Tudo</option>
                         @foreach([1 => 'Hoje', 7 => '7 dias', 30 => '30 dias', 90 => '90 dias'] as $v => $lbl)
                             <option value="{{ $v }}" @selected((int) ($filters['days'] ?? 0) === $v)>{{ $lbl }}</option>
@@ -52,42 +60,68 @@
                 </div>
                 {{-- preserva a ordenação atual ao aplicar filtros --}}
                 <input type="hidden" name="sort" value="{{ $sort }}">
-                <button type="submit" class="admin-btn admin-btn-primary">Filtrar</button>
-                <a href="{{ route('admin.ai-memory.sessions') }}" class="admin-btn">Limpar</a>
+                <div class="aim-filters__go">
+                    <button type="submit" class="admin-btn admin-btn-primary">Filtrar</button>
+                    @if($hasFilters)<a href="{{ route('admin.ai-memory.sessions') }}" class="admin-btn">Limpar</a>@endif
+                </div>
             </form>
 
-            <div style="overflow-x:auto">
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Agente</th>
-                            <th>Projeto</th>
-                            <th>Diretório</th>
-                            <th><a href="{{ $sortUrl($inicioNext) }}" style="color:inherit;text-decoration:none" title="Ordenar por início">Início{{ $inicioArrow }}</a></th>
-                            <th>Fim</th>
-                            <th><a href="{{ $sortUrl($durNext) }}" style="color:inherit;text-decoration:none" title="Ordenar por duração">Duração{{ $durArrow }}</a></th>
-                            <th>Obs</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($sessions as $s)
+            @if($sessions->isEmpty())
+                <div class="aim-blank">
+                    <i class="fa-solid fa-comments"></i>
+                    <p>{{ $hasFilters ? 'Nenhuma sessão para este filtro.' : 'Nenhuma sessão registrada ainda.' }}</p>
+                    <p>{{ $hasFilters ? 'Tente ampliar o período ou limpar os filtros.' : 'Uma sessão é aberta pelos hooks do agente (Claude Code, Codex…) ao começar a trabalhar num projeto.' }}</p>
+                </div>
+            @else
+                <div class="aim-scroll">
+                    <table class="admin-table">
+                        <thead>
                             <tr>
-                                <td><a href="{{ route('admin.ai-memory.sessions.show', $s->id_hex) }}"><span class="badge badge-accent">{{ $s->agent_kind }}</span></a></td>
-                                <td class="muted">{{ $s->project }}</td>
-                                <td style="max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="{{ $s->cwd }}"><code>{{ $s->cwd ?? '—' }}</code></td>
-                                <td class="muted" style="white-space:nowrap">{{ $T::format($s->started_at, 'd/m/Y H:i') }}</td>
-                                <td class="muted" style="white-space:nowrap">{{ $s->ended_at ? $T::format($s->ended_at, 'd/m/Y H:i') : '—' }}</td>
-                                <td class="muted" style="white-space:nowrap">{{ $T::duration($s->started_at, $s->ended_at) }}</td>
-                                <td>{{ $s->obs_count }}</td>
+                                <th scope="col">Agente</th>
+                                <th scope="col">Projeto</th>
+                                <th scope="col">Diretório</th>
+                                <th scope="col" aria-sort="{{ $sort === 'recent' ? 'descending' : ($sort === 'oldest' ? 'ascending' : 'none') }}">
+                                    <a href="{{ $sortUrl($startNext) }}" class="aim-th-sort" title="Ordenar por início">Início <i>{{ $startArrow }}</i></a>
+                                </th>
+                                <th scope="col" aria-sort="{{ $sort === 'longest' ? 'descending' : ($sort === 'shortest' ? 'ascending' : 'none') }}">
+                                    <a href="{{ $sortUrl($durNext) }}" class="aim-th-sort" title="Ordenar por duração">Duração <i>{{ $durArrow }}</i></a>
+                                </th>
+                                <th scope="col">Observações</th>
                             </tr>
-                        @empty
-                            <tr><td colspan="7" class="muted" style="text-align:center;padding:36px">Nenhuma sessão para o filtro.</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            @foreach($sessions as $s)
+                                <tr>
+                                    <td>
+                                        <a href="{{ route('admin.ai-memory.sessions.show', $s->id_hex) }}">
+                                            <span class="aim-chip aim-chip--accent">{{ $s->agent_kind }}</span>
+                                        </a>
+                                    </td>
+                                    <td class="aim-mono">{{ $s->project }}</td>
+                                    <td><span class="aim-path" style="--w:240px" title="{{ $s->cwd }}">{{ $s->cwd ?? '—' }}</span></td>
+                                    <td class="aim-when" title="{{ $T::format($s->started_at) }}">{{ $T::format($s->started_at, 'd/m/Y H:i') }}</td>
+                                    <td>
+                                        @if($s->ended_at)
+                                            <span class="aim-when">{{ $T::duration($s->started_at, $s->ended_at) }}</span>
+                                        @else
+                                            <span class="aim-chip aim-chip--live">em aberto</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="aim-bar">
+                                            <span class="aim-bar__track"><span class="aim-bar__fill" style="width:{{ round(($s->obs_count ?: 0) / $maxObs * 100, 1) }}%"></span></span>
+                                            <span class="aim-bar__n">{{ number_format((int) $s->obs_count, 0, ',', '.') }}</span>
+                                        </span>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
 
-            <div class="pagination">{{ $sessions->links() }}</div>
-        </div>
+                {{ $sessions->links() }}
+            @endif
+        </section>
     @endunless
+</div>
 @endsection

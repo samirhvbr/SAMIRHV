@@ -6,26 +6,8 @@
     <a href="{{ route('admin.ai-memory.pages') }}" class="admin-btn admin-btn-sm"><i class="fa-solid fa-arrow-left"></i> Páginas</a>
 @endsection
 
-@push('styles')
-<style>
-    .md-body{line-height:1.65;color:#dbe2ea;font-size:.92rem;max-width:820px}
-    .md-body h1,.md-body h2,.md-body h3,.md-body h4{color:#f1f5f9;margin:1.4em 0 .5em;line-height:1.25}
-    .md-body h1{font-size:1.5rem}.md-body h2{font-size:1.25rem}.md-body h3{font-size:1.08rem}
-    .md-body p{margin:.6em 0}
-    .md-body a{color:#a5b4fc;text-decoration:underline}
-    .md-body ul,.md-body ol{margin:.6em 0;padding-left:1.5em}
-    .md-body li{margin:.25em 0}
-    .md-body code{font-family:'JetBrains Mono',monospace;font-size:.82rem;background:var(--panel-2);border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:#a5b4fc}
-    .md-body pre{background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:14px 16px;overflow-x:auto;margin:.8em 0}
-    .md-body pre code{background:none;border:none;padding:0;color:#cbd5e1}
-    .md-body blockquote{border-left:3px solid var(--accent);margin:.8em 0;padding:.2em 0 .2em 14px;color:var(--muted)}
-    .md-body table{border-collapse:collapse;margin:.8em 0;font-size:.85rem}
-    .md-body th,.md-body td{border:1px solid var(--line);padding:6px 10px;text-align:left}
-    .md-body img{max-width:100%}
-</style>
-@endpush
-
 @section('content')
+<div class="aim">
     @include('admin.ai-memory._tabs')
 
     @unless($available)
@@ -33,63 +15,92 @@
     @else
         @php
             $T = \App\Services\AiMemory\AiMemoryTime::class;
-            $tierBadge = ['working' => 'badge-warn', 'episodic' => 'badge-accent', 'semantic' => 'badge-ok', 'procedural' => 'badge-muted'];
+            $tierChip = ['working' => 'aim-chip--warn', 'episodic' => 'aim-chip--accent', 'semantic' => 'aim-chip--ok'];
             $frontmatter = trim((string) $page->frontmatter_json);
+            $hasFrontmatter = $frontmatter !== '' && $frontmatter !== '{}';
         @endphp
 
-        <div class="an-grid-2" style="grid-template-columns:1fr 300px;align-items:start">
-            {{-- Conteúdo --}}
-            <div class="admin-card">
-                <h2 style="margin-bottom:6px">{{ $page->title }}</h2>
-                <div style="overflow-x:auto;margin-bottom:8px"><code style="color:#a5b4fc">{{ $page->path }}</code></div>
-                <div style="margin-bottom:18px">
-                    <span class="badge {{ $tierBadge[$page->tier] ?? 'badge-muted' }}">{{ $page->tier }}</span>
-                    @if($page->is_latest)
-                        <span class="badge badge-ok">versão atual</span>
-                    @else
-                        <span class="badge badge-warn">versão antiga</span>
-                    @endif
-                    @if($page->pinned)<span class="badge badge-accent">fixada</span>@endif
-                </div>
-
-                <div class="md-body">{!! \Illuminate\Support\Str::markdown($page->body, ['html_input' => 'escape', 'allow_unsafe_links' => false]) !!}</div>
-            </div>
-
-            {{-- Metadados + histórico --}}
+        <header class="aim-hero">
             <div>
-                <div class="admin-card">
-                    <h2>Metadados</h2>
-                    <ul class="an-list">
-                        <li><span class="card-sub">Projeto</span><span>{{ $page->project }}</span></li>
-                        <li><span class="card-sub">Workspace</span><span>{{ $page->workspace }}</span></li>
-                        <li><span class="card-sub">Autor</span><span>{{ $page->author ?? '—' }}</span></li>
-                        <li><span class="card-sub">Criada</span><span>{{ $T::format($page->created_at) }}</span></li>
-                        <li><span class="card-sub">Atualizada</span><span>{{ $T::format($page->updated_at) }}</span></li>
-                    </ul>
-                    @if($frontmatter !== '' && $frontmatter !== '{}')
-                        <p class="card-sub" style="margin:14px 0 6px">Frontmatter</p>
-                        <pre style="background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:10px;overflow-x:auto;font-size:.75rem;color:#cbd5e1">{{ $frontmatter }}</pre>
+                <h1>{{ $page->title }}</h1>
+                <div class="aim-hero__chips">
+                    <span class="aim-chip {{ $tierChip[$page->tier] ?? '' }}">{{ $page->tier }}</span>
+                    @if($page->is_latest)
+                        <span class="aim-chip aim-chip--ok">versão atual</span>
+                    @else
+                        <span class="aim-chip aim-chip--warn">versão antiga</span>
                     @endif
+                    @if($page->pinned)<span class="aim-chip aim-chip--accent">fixada</span>@endif
                 </div>
+                <code class="aim-hero__path">{{ $page->path }}</code>
+            </div>
+        </header>
 
-                <div class="admin-card">
-                    <h2>Histórico <span class="card-sub">({{ count($history) }})</span></h2>
-                    <ul class="an-list">
-                        @foreach($history as $v)
-                            <li>
-                                <span>
-                                    @if($v->id_hex === $page->id_hex)
-                                        <b>{{ $T::format($v->created_at, 'd/m/Y H:i') }}</b>
-                                    @else
-                                        <a href="{{ route('admin.ai-memory.pages.show', $v->id_hex) }}">{{ $T::format($v->created_at, 'd/m/Y H:i') }}</a>
-                                    @endif
-                                </span>
-                                <span>@if($v->is_latest)<span class="badge badge-ok">atual</span>@endif</span>
-                            </li>
-                        @endforeach
-                    </ul>
-                </div>
+        @unless($page->is_latest)
+            <div class="admin-alert admin-alert-warn">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                Você está lendo uma versão antiga desta página. A versão atual está no fim do histórico, à direita.
+            </div>
+        @endunless
+
+        <div class="aim-grid2" style="grid-template-columns:minmax(0,1fr) 320px">
+            <section class="admin-card aim-card">
+                @if(trim((string) $page->body) === '')
+                    <p class="aim-empty">Página sem corpo.</p>
+                @else
+                    <div class="aim-prose">
+                        {!! \Illuminate\Support\Str::markdown($page->body, ['html_input' => 'escape', 'allow_unsafe_links' => false]) !!}
+                    </div>
+                @endif
+            </section>
+
+            <div>
+                <section class="admin-card aim-card">
+                    <header class="aim-card__head"><div><h2>Metadados</h2></div></header>
+                    <dl class="aim-facts">
+                        <div><dt>Projeto</dt><dd>{{ $page->project }}</dd></div>
+                        <div><dt>Workspace</dt><dd>{{ $page->workspace }}</dd></div>
+                        <div><dt>Autor</dt><dd class="aim-mono">{{ $page->author ?? '—' }}</dd></div>
+                        <div><dt>Criada</dt><dd class="aim-mono">{{ $T::format($page->created_at) }}</dd></div>
+                        <div><dt>Atualizada</dt><dd class="aim-mono">{{ $T::format($page->updated_at) }}</dd></div>
+                    </dl>
+
+                    @if($hasFrontmatter)
+                        <p class="aim-sub" style="margin:16px 0 6px">Frontmatter</p>
+                        <pre class="aim-prose" style="margin:0"><code>{{ $frontmatter }}</code></pre>
+                    @endif
+                </section>
+
+                <section class="admin-card aim-card">
+                    <header class="aim-card__head">
+                        <div>
+                            <h2>Histórico</h2>
+                            <p class="aim-sub">{{ count($history) }} {{ count($history) === 1 ? 'versão' : 'versões' }}</p>
+                        </div>
+                    </header>
+
+                    @if(count($history) <= 1)
+                        <p class="aim-empty">Primeira e única versão — ainda não foi reescrita.</p>
+                    @else
+                        <ul class="aim-tl">
+                            @foreach($history as $v)
+                                <li>
+                                    <div class="aim-tl__time">{{ $T::format($v->created_at, 'd/m/Y H:i') }}</div>
+                                    <div class="aim-tl__row">
+                                        @if($v->id_hex === $page->id_hex)
+                                            <span class="aim-strong" style="font-size:.88rem">esta versão</span>
+                                        @else
+                                            <a href="{{ route('admin.ai-memory.pages.show', $v->id_hex) }}">abrir</a>
+                                        @endif
+                                        @if($v->is_latest)<span class="aim-chip aim-chip--ok">atual</span>@endif
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </section>
             </div>
         </div>
     @endunless
+</div>
 @endsection

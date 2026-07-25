@@ -7,56 +7,94 @@
 @endsection
 
 @section('content')
+<div class="aim">
     @include('admin.ai-memory._tabs')
 
     @unless($available)
         @include('admin.ai-memory._unavailable')
     @else
-        @php $T = \App\Services\AiMemory\AiMemoryTime::class; @endphp
+        @php
+            $T = \App\Services\AiMemory\AiMemoryTime::class;
+            $n = fn ($v) => number_format((int) $v, 0, ',', '.');
+            $tierChip = ['working' => 'aim-chip--warn', 'episodic' => 'aim-chip--accent', 'semantic' => 'aim-chip--ok'];
+        @endphp
 
-        <div class="admin-card">
-            <h2>{{ $project->name }} <span class="card-sub">— workspace {{ $project->workspace }}</span></h2>
-            <p class="card-sub" style="margin:0 0 4px">Repositório</p>
-            <div style="overflow-x:auto"><code style="color:#a5b4fc">{{ $project->repo_path ?? '—' }}</code></div>
-            <p class="card-sub" style="margin-top:12px">Criado em {{ $T::format($project->created_at) }}</p>
-        </div>
+        <header class="aim-hero">
+            <div>
+                <h1>{{ $project->name }}</h1>
+                <div class="aim-hero__chips">
+                    <span class="aim-chip">workspace {{ $project->workspace }}</span>
+                    <span class="aim-chip">criado em {{ $T::format($project->created_at, 'd/m/Y') }}</span>
+                </div>
+                <code class="aim-hero__path">{{ $project->repo_path ?? 'sem caminho de repositório' }}</code>
+            </div>
+        </header>
 
-        <div class="admin-stats-grid" style="grid-template-columns:repeat(3,1fr)">
-            <div class="admin-stat"><div class="label">Páginas</div><div class="value">{{ $project->pages }}</div></div>
-            <div class="admin-stat"><div class="label">Sessões</div><div class="value">{{ $project->sessions }}</div></div>
-            <div class="admin-stat"><div class="label">Observações</div><div class="value">{{ $project->observations }}</div></div>
-        </div>
+        <section class="aim-panel" aria-label="Totais do projeto">
+            <div class="aim-panel__row aim-panel__row--3">
+                <div class="aim-cell">
+                    <p class="aim-label">Páginas</p>
+                    <a class="aim-cell__link" href="{{ route('admin.ai-memory.pages', ['project' => $project->id_hex]) }}">
+                        <p class="aim-value aim-value--md">{{ $n($project->pages) }}</p>
+                    </a>
+                </div>
+                <div class="aim-cell">
+                    <p class="aim-label">Sessões</p>
+                    <a class="aim-cell__link" href="{{ route('admin.ai-memory.sessions', ['project' => $project->id_hex]) }}">
+                        <p class="aim-value aim-value--md">{{ $n($project->sessions) }}</p>
+                    </a>
+                </div>
+                <div class="aim-cell">
+                    <p class="aim-label">Observações</p>
+                    <a class="aim-cell__link" href="{{ route('admin.ai-memory.observations', ['project' => $project->id_hex]) }}">
+                        <p class="aim-value aim-value--md">{{ $n($project->observations) }}</p>
+                    </a>
+                </div>
+            </div>
+        </section>
 
-        <div class="tabs">
-            <a href="{{ route('admin.ai-memory.pages', ['project' => $project->id_hex]) }}" class="admin-btn admin-btn-sm">Ver todas as páginas</a>
-            <a href="{{ route('admin.ai-memory.sessions', ['project' => $project->id_hex]) }}" class="admin-btn admin-btn-sm">Ver todas as sessões</a>
-            <a href="{{ route('admin.ai-memory.observations', ['project' => $project->id_hex]) }}" class="admin-btn admin-btn-sm">Ver observações</a>
-        </div>
+        <div class="aim-grid2 aim-grid2--even">
+            <section class="admin-card aim-card">
+                <header class="aim-card__head">
+                    <div>
+                        <h2>Páginas recentes</h2>
+                        <p class="aim-sub">conhecimento consolidado deste projeto</p>
+                    </div>
+                    <a href="{{ route('admin.ai-memory.pages', ['project' => $project->id_hex]) }}" class="admin-btn admin-btn-sm">ver todas</a>
+                </header>
 
-        <div class="an-grid-2">
-            <div class="admin-card">
-                <h2>Páginas recentes</h2>
                 @forelse($recentPages as $pg)
-                    <div class="an-hbar-row" style="justify-content:space-between">
-                        <a href="{{ route('admin.ai-memory.pages.show', $pg->id_hex) }}" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="{{ $pg->path }}">{{ $pg->title }}</a>
-                        <span class="badge badge-muted">{{ $pg->tier }}</span>
+                    <div class="aim-tl__row" style="justify-content:space-between;margin:0;padding:9px 0;border-bottom:1px solid var(--hair)">
+                        <a href="{{ route('admin.ai-memory.pages.show', $pg->id_hex) }}" title="{{ $pg->path }}" style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ $pg->title }}</a>
+                        <span class="aim-chip {{ $tierChip[$pg->tier] ?? '' }}">{{ $pg->tier }}</span>
                     </div>
                 @empty
-                    <p class="card-sub">Sem páginas.</p>
+                    <p class="aim-empty">Nenhuma página consolidada neste projeto ainda.</p>
                 @endforelse
-            </div>
+            </section>
 
-            <div class="admin-card">
-                <h2>Sessões recentes</h2>
+            <section class="admin-card aim-card">
+                <header class="aim-card__head">
+                    <div>
+                        <h2>Sessões recentes</h2>
+                        <p class="aim-sub">quem trabalhou aqui, e quanto rendeu</p>
+                    </div>
+                    <a href="{{ route('admin.ai-memory.sessions', ['project' => $project->id_hex]) }}" class="admin-btn admin-btn-sm">ver todas</a>
+                </header>
+
                 @forelse($recentSessions as $s)
-                    <div class="an-hbar-row" style="justify-content:space-between">
-                        <a href="{{ route('admin.ai-memory.sessions.show', $s->id_hex) }}" style="flex:1"><span class="badge badge-accent">{{ $s->agent_kind }}</span> <span class="card-sub">{{ $T::format($s->started_at, 'd/m H:i') }}</span></a>
-                        <span class="card-sub">{{ $s->obs_count }} obs</span>
+                    <div class="aim-tl__row" style="justify-content:space-between;margin:0;padding:9px 0;border-bottom:1px solid var(--hair)">
+                        <a href="{{ route('admin.ai-memory.sessions.show', $s->id_hex) }}">
+                            <span class="aim-chip aim-chip--accent">{{ $s->agent_kind }}</span>
+                            <span class="aim-when" style="margin-left:8px">{{ $T::format($s->started_at, 'd/m H:i') }}</span>
+                        </a>
+                        <span class="aim-mono">{{ $n($s->obs_count) }} obs</span>
                     </div>
                 @empty
-                    <p class="card-sub">Sem sessões.</p>
+                    <p class="aim-empty">Nenhuma sessão registrada neste projeto ainda.</p>
                 @endforelse
-            </div>
+            </section>
         </div>
     @endunless
+</div>
 @endsection
