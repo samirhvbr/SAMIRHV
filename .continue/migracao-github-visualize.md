@@ -265,13 +265,13 @@ já faz isso; sem Turbo/WebSocket.
 dashboard completo (autocomplete `/suggestions`) · sync status por polling.
 
 **Paridade com o upstream (Akita):**
-- Clone Rails de referência: `~/x/github-visualize`. ⚠️ Hoje o `origin` desse clone
+- Clone Rails de referência: `~/x/000/github-visualize`. ⚠️ Hoje o `origin` desse clone
   aponta DIRETO pro `akitaonrails/github-visualize` (não pro fork). O fork
   `samirhvbr/github-visualize` existe no GitHub — pra abrir PR, adicione-o como
   remote e dê push da branch lá (passo a passo no §16).
 - **Sincronizado até:** `b0e9f59` (HEAD do upstream em 15/07/2026).
 - **Quando o Akita atualizar:**
-  1. `git -C ~/x/github-visualize fetch upstream`
+  1. `git -C ~/x/000/github-visualize fetch upstream`
   2. `git log --oneline b0e9f59..upstream/master` → o que mudou (a *spec*).
   3. Aplicar no SAMIRHV: **JS/canvas** e a **query GraphQL** copiam/adaptam
      ~verbatim; **Ruby** re-traduz pro Laravel (a tradução 1:1 deste doc).
@@ -287,7 +287,7 @@ lados, com papéis distintos:
 | Artefato | Caminho | Stack | Papel |
 |---|---|---|---|
 | SAMIRHV (GitHub View) | `~/x/SAMIRHV/samirhv` | Laravel/PHP | **Produção** (samirhv.com.br/admin) — aplicar aqui primeiro |
-| Fork do Akita | `~/x/github-visualize` | Rails/Ruby | Referência + **PR upstream** — manter igual e propor ao Akita |
+| Fork do Akita | `~/x/000/github-visualize` | Rails/Ruby | Referência + **PR upstream** — manter igual e propor ao Akita |
 
 **Idioma:** tudo do lado Rails/fork (código, comentários, mensagens de commit,
 corpo do PR) em **inglês** — padrão do Akita. O lado SAMIRHV e estes docs
@@ -295,7 +295,7 @@ corpo do PR) em **inglês** — padrão do Akita. O lado SAMIRHV e estes docs
 
 **Fluxo p/ novidade NOSSA** (ex.: o fix de repos de org + busca):
 1. Implementar no **SAMIRHV** (Laravel) → conserta a produção.
-2. Espelhar a MESMA mudança no **fork Rails** (`~/x/github-visualize`) → vira PR
+2. Espelhar a MESMA mudança no **fork Rails** (`~/x/000/github-visualize`) → vira PR
    pro `akitaonrails/github-visualize` (contribuição limpa, 1 stack só).
 3. Registrar em "Mudanças nossas" abaixo.
 
@@ -304,7 +304,7 @@ re-traduzir pro Laravel → bump do "Sincronizado até").
 
 **Abrir o PR do fix Rails** (o clone local não tem o fork como remote):
 ```bash
-cd ~/x/github-visualize
+cd ~/x/000/github-visualize
 git remote add fork git@github.com:samirhvbr/github-visualize.git   # 1x
 git switch -c feat/org-repos-and-search
 git add -A && git commit                     # padrão de commit do repo
