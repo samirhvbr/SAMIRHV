@@ -48,6 +48,7 @@ Route::prefix('admin')->name('admin.')
                 Route::get('/live', 'live')->name('live');   // JSON do "ao vivo" do Dashboard
                 Route::get('/projetos', 'projects')->name('projects');
                 Route::get('/projetos/{hexId}', 'projectShow')->name('projects.show');
+                Route::get('/workspaces', 'workspaces')->name('workspaces');
                 Route::get('/paginas', 'pages')->name('pages');
                 Route::get('/paginas/{hexId}', 'pageShow')->name('pages.show');
                 Route::get('/sessoes', 'sessions')->name('sessions');

@@ -33,6 +33,7 @@
     $tabs = [
         'admin.ai-memory.dashboard' => 'Dashboard',
         'admin.ai-memory.projects' => 'Projetos',
+        'admin.ai-memory.workspaces' => 'Workspaces',
         'admin.ai-memory.pages' => 'Páginas',
         'admin.ai-memory.sessions' => 'Sessões',
         'admin.ai-memory.observations' => 'Observações',

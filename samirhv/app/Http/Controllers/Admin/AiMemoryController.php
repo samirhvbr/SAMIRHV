@@ -13,6 +13,7 @@ use App\Services\AiMemory\ProjectRepository;
 use App\Services\AiMemory\SearchRepository;
 use App\Services\AiMemory\SessionRepository;
 use App\Services\AiMemory\StatsRepository;
+use App\Services\AiMemory\WorkspaceRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -93,6 +94,13 @@ class AiMemoryController extends Controller
                 'recentSessions' => $sessions->paginate(['project' => $hexId], 10)->items(),
             ];
         });
+    }
+
+    public function workspaces(WorkspaceRepository $workspaces): View
+    {
+        return $this->screen('admin.ai-memory.workspaces', fn () => [
+            'workspaces' => $workspaces->all(),
+        ]);
     }
 
     public function pages(Request $request, PageRepository $pages, ProjectRepository $projects): View

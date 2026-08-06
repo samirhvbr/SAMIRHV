@@ -85,7 +85,9 @@
             <div class="aim-panel__row aim-panel__row--facts">
                 <div class="aim-cell">
                     <p class="aim-label">Workspaces</p>
-                    <p class="aim-value aim-value--sm" data-live="counts.workspaces">{{ $n($counts['workspaces']) }}</p>
+                    <a class="aim-fact" href="{{ route('admin.ai-memory.workspaces') }}">
+                        <span class="aim-value aim-value--sm" data-live="counts.workspaces">{{ $n($counts['workspaces']) }}</span>
+                    </a>
                 </div>
                 <div class="aim-cell">
                     <p class="aim-label">Projetos</p>

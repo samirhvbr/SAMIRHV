@@ -130,7 +130,7 @@ Para mudar o intervalo: `data-every` (segundos) no elemento `[data-aim-live]`.
 | --- | --- |
 | Conexão RO + `isAvailable` + paginação | `app/Services/AiMemory/AiMemoryDatabase.php` |
 | Formatação de tempo (µs → local) | `app/Services/AiMemory/AiMemoryTime.php` |
-| Consultas (1 por tela) | `app/Services/AiMemory/{Stats,Project,Page,Session,Observation,Handoff,Search}Repository.php` |
+| Consultas (1 por tela) | `app/Services/AiMemory/{Stats,Project,Workspace,Page,Session,Observation,Handoff,Search}Repository.php` |
 | Números derivados do Dashboard (sem banco) | `app/Services/AiMemory/DashboardSummary.php` |
 | JSON do "ao vivo" do Dashboard | `AiMemoryController::live()` → rota `admin.ai-memory.live` |
 | Sistema visual do módulo (CSS, `@once`) | `resources/views/admin/ai-memory/_styles.blade.php` |
@@ -149,11 +149,15 @@ As consultas seguem as migrações do ai-memory
 - **timestamps = microssegundos** desde epoch (UTC) → dividir por 1.000.000;
 - **ids = BLOB** (UUIDv7) → nas URLs usamos `lower(hex(id))` (32 chars);
 - `pages`: versão atual `is_latest=1`; histórico via `supersedes`;
-- busca via `pages_fts` (FTS5, colunas `title`+`body`), ordenada por `bm25`.
+- busca via `pages_fts` (FTS5, colunas `title`+`body`), ordenada por `bm25`;
+- `workspaces`: só `id` e `name` são referenciados no código — nenhuma consulta
+  usa outra coluna (ex.: `created_at`), então não está confirmada por aqui; `projects`,
+  `pages` e `sessions` têm `workspace_id` direto (não só via `project_id`), é isso
+  que `WorkspaceRepository` soma para as contagens da listagem.
 
 ## 7. Fase 2 (fora do escopo atual)
 
 - **Auto Improve** (aprovar/rejeitar propostas) e **gerar embeddings** —
   **escrita**, portanto via **API/MCP do ai-memory**, nunca neste SQLite.
 - **Knowledge Graph** visual a partir da tabela `links`.
-- Telas dedicadas de Workspaces / Embeddings / Auditoria do ai-memory.
+- Telas dedicadas de Embeddings / Auditoria do ai-memory (Workspaces já saiu da lista — ver `WorkspaceRepository`).
